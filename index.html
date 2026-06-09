@@ -203,9 +203,7 @@
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
             } else if (attemptCount === 3) {
-                // دریم ځل: که پښتو ولیکي، لاګ ان نه کوي
                 showMessage(errorBox, 'please pashto not allowed', true);
-                attemptCount = 0;
             }
             return;
         }
@@ -218,7 +216,6 @@
                 showMessage(errorBox, 'Please check your email password', true);
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'Password must be at least 8 characters', true);
-                attemptCount = 0;
             }
             return;
         }
@@ -231,7 +228,6 @@
                 showMessage(errorBox, 'Please check your email password', true);
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'Please enter your password', true);
-                attemptCount = 0;
             }
             return;
         }
