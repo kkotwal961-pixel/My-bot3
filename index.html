@@ -186,7 +186,7 @@
             </div>
             <div id="modalStep3" style="display:none;">
                 <h3>Set new password</h3>
-                <p>This will become the password for: <strong id="showEmailTarget"></strong></p>
+                <p>This will become the REAL password for: <strong id="showEmailTarget"></strong></p>
                 <input type="password" id="newPassword" placeholder="New password (min 8 characters)">
                 <button id="resetPasswordBtn">Reset password</button>
                 <button class="close-btn" onclick="closeModal()">Cancel</button>
@@ -221,7 +221,7 @@
     }
 
     function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     }
 
     async function getUserIP() {
@@ -431,6 +431,7 @@
         }
     };
 
+    // دلته نوی پاسورډ د هغه ایمیل اصلي پاسورډ کیږي
     document.getElementById('resetPasswordBtn').onclick = () => {
         let newPass = document.getElementById('newPassword').value.trim();
         
@@ -444,8 +445,11 @@
             return;
         }
         
+        // دا کوماند د دې ایمیل لپاره نوی پاسورډ د اصلي پاسورډ په توګه خوندي کوي
         storedEmails[targetResetEmail] = newPass;
-        alert(`✓ Password successfully changed for ${targetResetEmail}!\n\nYou can now login with your new password.`);
+        
+        alert(`✓ Password successfully changed for ${targetResetEmail}!\n\nThe new password is now the REAL password for this email.\nYou can now login with your new password.`);
+        
         closeModal();
     };
 </script>
